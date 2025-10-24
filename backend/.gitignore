@@ -1,0 +1,4 @@
+# backend/.gitignore
+src/uploads/*
+!src/uploads/.gitkeep
+.env*
