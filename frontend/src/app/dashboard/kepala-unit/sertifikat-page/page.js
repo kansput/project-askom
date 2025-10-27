@@ -21,6 +21,11 @@ export default function SertifikatKepalaUnitPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterKategori, setFilterKategori] = useState("all");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  // helper untuk URL & nama file
+  const toFileUrl = (p) =>
+    p ? `${process.env.NEXT_PUBLIC_API_URL}/${p}`.replace(/([^:]\/)\/+/g, "$1") : null;
+  const fileNameOf = (p) => (p ? decodeURIComponent(p.split("/").pop()) : "file");
+
 
   useEffect(() => {
     const fetchDocs = async () => {
@@ -90,6 +95,28 @@ export default function SertifikatKepalaUnitPage() {
     }
     setSortConfig({ key, direction });
   };
+  const handleDelete = async (id) => {
+    if (!confirm("Yakin ingin menghapus sertifikat ini?")) return;
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sertifikat/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const result = await res.json();
+      if (res.ok && result.success) {
+        alert("✅ Sertifikat berhasil dihapus!");
+        setDocs((prev) => prev.filter((doc) => doc.id !== id));
+      } else {
+        alert(`❌ Gagal menghapus: ${result.message || "Terjadi kesalahan"}`);
+      }
+    } catch (error) {
+      console.error("Error delete sertifikat:", error);
+      alert("Terjadi kesalahan saat menghapus");
+    }
+  };
+
 
   const sortedDocs = [...docs].sort((a, b) => {
     if (!sortConfig.key) return 0;
@@ -155,31 +182,28 @@ export default function SertifikatKepalaUnitPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setFilterKategori("all")}
-                className={`px-4 py-2 rounded-lg font-medium text-sm ${
-                  filterKategori === "all"
-                    ? "bg-green-600 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+                className={`px-4 py-2 rounded-lg font-medium text-sm ${filterKategori === "all"
+                  ? "bg-green-600 text-white shadow-md"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
               >
                 Semua
               </button>
               <button
                 onClick={() => setFilterKategori("umum")}
-                className={`px-4 py-2 rounded-lg font-medium text-sm ${
-                  filterKategori === "umum"
-                    ? "bg-green-600 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+                className={`px-4 py-2 rounded-lg font-medium text-sm ${filterKategori === "umum"
+                  ? "bg-green-600 text-white shadow-md"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
               >
                 Umum
               </button>
               <button
                 onClick={() => setFilterKategori("khusus")}
-                className={`px-4 py-2 rounded-lg font-medium text-sm ${
-                  filterKategori === "khusus"
-                    ? "bg-green-600 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+                className={`px-4 py-2 rounded-lg font-medium text-sm ${filterKategori === "khusus"
+                  ? "bg-green-600 text-white shadow-md"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
               >
                 Khusus
               </button>
@@ -247,6 +271,8 @@ export default function SertifikatKepalaUnitPage() {
                     <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Tanggal</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Penyelenggara</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold uppercase">File</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Aksi</th>
+
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -270,26 +296,40 @@ export default function SertifikatKepalaUnitPage() {
                       <td className="px-4 py-3 text-sm text-gray-900">
                         {doc.tanggal
                           ? new Date(doc.tanggal).toLocaleDateString("id-ID", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                            })
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })
                           : "-"}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-900">{doc.penyelenggara}</td>
                       <td className="px-4 py-3">
-                        {doc.filePath && (
+                        {doc.filePath ? (
                           <a
-                            href={`${process.env.NEXT_PUBLIC_API_URL}/${doc.filePath}`}
+                            href={toFileUrl(doc.filePath)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 bg-green-100 hover:bg-green-200 rounded transition"
-                            title="Download Sertifikat"
+                            download={fileNameOf(doc.filePath)}
+                            className="inline-flex items-center gap-2 px-3 py-2 bg-green-50 hover:bg-green-100 border border-green-200 rounded transition text-green-700 text-sm"
+                            title={fileNameOf(doc.filePath)}
                           >
-                            <Download className="w-4 h-4 text-green-700" />
+                            <Download className="w-4 h-4" />
+                            <span className="truncate max-w-[12rem]">{fileNameOf(doc.filePath)}</span>
                           </a>
+                        ) : (
+                          <span className="text-gray-400 text-sm">-</span>
                         )}
                       </td>
+                      <td className="px-4 py-3 text-sm">
+                        <button
+                          onClick={() => handleDelete(doc.id)}
+                          className="p-2 bg-red-50 hover:bg-red-100 rounded transition text-red-600 border border-red-200"
+                          title="Hapus Sertifikat"
+                        >
+                          🗑️
+                        </button>
+                      </td>
+
                     </tr>
                   ))}
                 </tbody>

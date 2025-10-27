@@ -69,9 +69,9 @@ export const getAllSertifikat = async (req, res) => {
       const obj = d.toJSON();
       return {
         ...obj,
-        username: obj.User?.username || null,
-        unit: obj.User?.unit || null,
-        User: undefined,
+        username: obj.User?.username || "-",
+        npk: obj.User?.npk || "-",
+        unit: obj.User?.unit || "-",
       };
     });
 
@@ -81,6 +81,7 @@ export const getAllSertifikat = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 // GET BY USER
 export const getSertifikatByUser = async (req, res) => {
@@ -104,7 +105,7 @@ export const deleteSertifikat = async (req, res) => {
     const { id } = req.params;
     const sertifikat = await Sertifikat.findByPk(id);
     if (!sertifikat) {
-      return res.status(404).json({ success: false, message: "❌ Sertifikat tidak ditemukan" });
+      return res.status(404).json({ success: false, message: " Sertifikat tidak ditemukan" });
     }
 
     if (sertifikat.filePath) {

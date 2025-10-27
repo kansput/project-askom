@@ -18,9 +18,7 @@ export default function StrRiwayatPage() {
     const [deletingId, setDeletingId] = useState(null);
     const itemsPerPage = 10;
 
-    useEffect(() => {
-        fetchDocs();
-    }, [fetchDocs]);
+   
 
     const fetchDocs = useCallback(async () => {
         try {
@@ -47,7 +45,7 @@ export default function StrRiwayatPage() {
                 url = `${process.env.NEXT_PUBLIC_API_URL}/api/str/user/${userId}`;
             }
 
-            console.log("📝 Fetching documents from:", url);
+            console.log("Fetching documents from:", url);
 
             const res = await fetch(url, {
                 method: "GET",
@@ -87,6 +85,10 @@ export default function StrRiwayatPage() {
             setLoading(false);
         }
     }, [router]);
+
+    useEffect(() => {
+        fetchDocs();
+    }, [fetchDocs]);
 
     const handleDelete = async (docId) => {
         if (!confirm("Apakah Anda yakin ingin menghapus dokumen ini?")) {

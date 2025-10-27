@@ -1,11 +1,6 @@
 import express from "express";
 import upload from "../middlewares/sertifikatUploadMiddleware.js";
-import {
-  createSertifikat,
-  getAllSertifikat,
-  getSertifikatByUser,
-  deleteSertifikat,
-} from "../controllers/sertifikatController.js";
+import {createSertifikat,getAllSertifikat,getSertifikatByUser,deleteSertifikat,} from "../controllers/sertifikatController.js";
 
 const router = express.Router();
 

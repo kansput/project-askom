@@ -7,6 +7,14 @@ const Sertifikat = sequelize.define("Sertifikat", {
     primaryKey: true,
     autoIncrement: true,
   },
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: "Users",
+      key: "id",
+    },
+  },
   kategori: {
     type: DataTypes.ENUM("umum", "khusus"),
     allowNull: false,
