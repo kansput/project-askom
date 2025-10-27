@@ -2,7 +2,7 @@
 const nextConfig = {
   experimental: {
     allowedDevOrigins: [
-      'http://172.16.158.78:3000', // frontend diakses dari LAN
+      `${process.env.NEXT_PUBLIC_WEBSITE_URL}`, // frontend diakses dari LAN
       'http://localhost:3000'
     ],
   },

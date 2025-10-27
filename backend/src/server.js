@@ -38,7 +38,7 @@ const PORT = process.env.PORT || 5000;
 // ✅ CORS Configuration
 app.use(cors({
   origin: [
-    'http://172.16.158.78:3000',
+    `${process.env.NEXT_PUBLIC_WEBSITE_URL}`,
     'http://localhost:3000',
     'http://127.0.0.1:3000'
   ],
