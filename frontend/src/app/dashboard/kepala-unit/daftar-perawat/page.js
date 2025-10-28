@@ -96,11 +96,15 @@ const NurseTable = ({ title, perawat, headerColor, onEdit }) => {
                 <td className="px-4 py-4 text-sm text-gray-900">
                   {p.tanggalLahir ? new Date(p.tanggalLahir).toLocaleDateString("id-ID") : "-"}
                 </td>
-                <td className="px-4 py-4 text-sm text-gray-900">
+                <td className="px-4 py-4 text-sm">
                   <button
                     onClick={() => onEdit(p)}
-                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                    className="group flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md shadow-sm hover:bg-blue-700 hover:shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                    title="Edit data"
                   >
+                    <svg className="w-3.5 h-3.5 -ml-0.5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
                     Edit
                   </button>
                 </td>

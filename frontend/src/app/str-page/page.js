@@ -72,7 +72,7 @@ export default function StrRiwayatPage() {
                 throw new Error(result.message || "Gagal memuat dokumen");
             }
         } catch (err) {
-            console.error("❌ Error fetch:", err);
+            console.error(" Error fetch:", err);
             setError(err.message || "Terjadi kesalahan saat mengambil data");
 
             if (err.message.includes("401") || err.message.includes("403") || err.message.includes("Token")) {

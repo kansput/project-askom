@@ -2,6 +2,8 @@
 import { useEffect, useState, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import jsPDF from "jspdf";
+
 
 export default function HasilPenilaianKeterampilanPage() {
   const [penilaianList, setPenilaianList] = useState([]);
@@ -102,6 +104,86 @@ export default function HasilPenilaianKeterampilanPage() {
       alert("Terjadi kesalahan saat menghapus data");
     }
   };
+
+  const handleExportPDF = async (item) => {
+    try {
+      const { jsPDF } = await import("jspdf");
+      const { autoTable } = await import("jspdf-autotable");
+
+      const doc = new jsPDF();
+
+      // === HEADER ===
+      doc.setFontSize(16);
+      doc.text("Laporan Penilaian Keterampilan Perawat", 14, 20);
+      doc.setFontSize(10);
+      doc.text("Sistem Re-Kredensial Keperawatan Rumah Sakit St. Carolus", 14, 27);
+      doc.line(14, 30, 195, 30);
+
+      // === IDENTITAS PERAWAT ===
+      doc.setFontSize(12);
+      const detailRows = [
+        ["Nama Perawat", item.perawatKeterampilan?.username || "-"],
+        ["NPK", item.perawat_npk],
+        ["Unit", item.perawatKeterampilan?.unit || "-"],
+        ["Tanggal Penilaian", formatDate(item.tanggal_penilaian)],
+        ["Prosedur", item.prosedur],
+        ["Nilai Akhir", parseFloat(item.nilai_akhir).toFixed(2)],
+        ["Grade", item.grade || calculateGrade(parseFloat(item.nilai_akhir))],
+        ["Status", getStatusText(item.status)],
+        ["Penilai", item.penilaiKeterampilan?.username || "-"],
+      ];
+
+      autoTable(doc, {
+        startY: 35,
+        head: [["Keterangan", "Detail"]],
+        body: detailRows,
+        theme: "grid",
+        styles: { fontSize: 11, cellPadding: 4 },
+        headStyles: { fillColor: [41, 128, 185] },
+        columnStyles: {
+          0: { cellWidth: 60, fontStyle: "bold" },
+          1: { cellWidth: 120 },
+        },
+      });
+
+      // === FOOTER ===
+      const pageHeight = doc.internal.pageSize.height;
+      const now = new Date(); // Ambil waktu sekarang sekali saja
+
+      // Format tanggal
+      const tanggal = now.toLocaleDateString("id-ID");
+      // Format jam (pakai options biar jadi hh:mm:ss, walau "id-ID" biasanya pakai titik)
+      const jam = now.toLocaleTimeString("id-ID", {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+
+      doc.setFontSize(10);
+      doc.text(
+        "Dokumen ini dihasilkan otomatis oleh Sistem Penilaian Keterampilan.",
+        14,
+        pageHeight - 14
+      );
+      doc.text(
+        `Tanggal cetak: ${tanggal}, Jam: ${jam}`, // Gabungkan di sini
+        14,
+        pageHeight - 8
+      );
+
+      // === PREVIEW PDF ===
+      const pdfUrl = doc.output("bloburl");
+      window.open(pdfUrl, "_blank");
+      console.log("✅ PDF berhasil dibuat dan ditampilkan");
+    } catch (err) {
+      console.error("❌ Error generating PDF:", err);
+      alert("Terjadi kesalahan saat membuat PDF. Cek console log.");
+    }
+  };
+
+
+
+
 
   // Filter data
   const filteredData = penilaianList.filter(item => {
@@ -227,7 +309,6 @@ export default function HasilPenilaianKeterampilanPage() {
                     <option value="">Semua Status</option>
                     <option value="draft">Draft</option>
                     <option value="selesai">Selesai</option>
-                    <option value="final">Final</option>
                   </select>
                 </div>
               </div>
@@ -359,25 +440,37 @@ export default function HasilPenilaianKeterampilanPage() {
                           </td>
 
                           {/* Kolom Aksi - Hapus data */}
+                          {/* Kolom Aksi */}
                           <td className="px-6 py-4 text-center">
-                            <div className="flex justify-center space-x-2">
-                              <button
-                                onClick={() => {
-                                  // Tampilkan detail penilaian
-                                  const detailText = `Detail Penilaian Keterampilan:\n\nPerawat: ${item.perawatKeterampilan?.username || '-'}\nUnit: ${item.perawatKeterampilan?.unit || '-'}\nProsedur: ${item.prosedur}\nTanggal: ${formatDate(item.tanggal_penilaian)}\nNilai Akhir: ${item.nilai_akhir}\nGrade: ${finalGrade}\nStatus: ${getStatusText(item.status)}\nPenilai: ${item.penilaiKeterampilan?.username || '-'}`;
-                                  alert(detailText);
-                                }}
-                                className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors"
-                              >
-                                Detail
-                              </button>
+                            <div className="flex justify-center items-center gap-2">
 
-                              {/* Tombol Hapus - hanya untuk penilai (bukan perawat) */}
+                              {/* Tombol Detail */}
+
+
+                              {/* Tombol Export PDF */}
+                              {item.status === "selesai" && (
+                                <button
+                                  onClick={() => handleExportPDF(item)}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-green-600 to-green-700 rounded-md shadow-sm hover:from-green-700 hover:to-green-800 transition-all duration-200"
+                                  title="Export ke PDF"
+                                >
+                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                  </svg>
+                                  PDF
+                                </button>
+                              )}
+
+                              {/* Tombol Hapus */}
                               {currentUser.role !== "perawat" && (
                                 <button
                                   onClick={() => handleDelete(item.id)}
-                                  className="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors"
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 rounded-md border border-red-200 hover:bg-red-100 hover:border-red-300 transition-all duration-200"
+                                  title="Hapus penilaian"
                                 >
+                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  </svg>
                                   Hapus
                                 </button>
                               )}
