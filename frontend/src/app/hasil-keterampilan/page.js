@@ -3,6 +3,8 @@ import { useEffect, useState, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import jsPDF from "jspdf";
+import { handleExportPDF } from "@/utils/exportketerampilanPDF";
+
 
 
 export default function HasilPenilaianKeterampilanPage() {
@@ -104,84 +106,6 @@ export default function HasilPenilaianKeterampilanPage() {
       alert("Terjadi kesalahan saat menghapus data");
     }
   };
-
-  const handleExportPDF = async (item) => {
-    try {
-      const { jsPDF } = await import("jspdf");
-      const { autoTable } = await import("jspdf-autotable");
-
-      const doc = new jsPDF();
-
-      // === HEADER ===
-      doc.setFontSize(16);
-      doc.text("Laporan Penilaian Keterampilan Perawat", 14, 20);
-      doc.setFontSize(10);
-      doc.text("Sistem Re-Kredensial Keperawatan Rumah Sakit St. Carolus", 14, 27);
-      doc.line(14, 30, 195, 30);
-
-      // === IDENTITAS PERAWAT ===
-      doc.setFontSize(12);
-      const detailRows = [
-        ["Nama Perawat", item.perawatKeterampilan?.username || "-"],
-        ["NPK", item.perawat_npk],
-        ["Unit", item.perawatKeterampilan?.unit || "-"],
-        ["Tanggal Penilaian", formatDate(item.tanggal_penilaian)],
-        ["Prosedur", item.prosedur],
-        ["Nilai Akhir", parseFloat(item.nilai_akhir).toFixed(2)],
-        ["Grade", item.grade || calculateGrade(parseFloat(item.nilai_akhir))],
-        ["Status", getStatusText(item.status)],
-        ["Penilai", item.penilaiKeterampilan?.username || "-"],
-      ];
-
-      autoTable(doc, {
-        startY: 35,
-        head: [["Keterangan", "Detail"]],
-        body: detailRows,
-        theme: "grid",
-        styles: { fontSize: 11, cellPadding: 4 },
-        headStyles: { fillColor: [41, 128, 185] },
-        columnStyles: {
-          0: { cellWidth: 60, fontStyle: "bold" },
-          1: { cellWidth: 120 },
-        },
-      });
-
-      // === FOOTER ===
-      const pageHeight = doc.internal.pageSize.height;
-      const now = new Date(); // Ambil waktu sekarang sekali saja
-
-      // Format tanggal
-      const tanggal = now.toLocaleDateString("id-ID");
-      // Format jam (pakai options biar jadi hh:mm:ss, walau "id-ID" biasanya pakai titik)
-      const jam = now.toLocaleTimeString("id-ID", {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
-
-      doc.setFontSize(10);
-      doc.text(
-        "Dokumen ini dihasilkan otomatis oleh Sistem Penilaian Keterampilan.",
-        14,
-        pageHeight - 14
-      );
-      doc.text(
-        `Tanggal cetak: ${tanggal}, Jam: ${jam}`, // Gabungkan di sini
-        14,
-        pageHeight - 8
-      );
-
-      // === PREVIEW PDF ===
-      const pdfUrl = doc.output("bloburl");
-      window.open(pdfUrl, "_blank");
-      console.log("✅ PDF berhasil dibuat dan ditampilkan");
-    } catch (err) {
-      console.error("❌ Error generating PDF:", err);
-      alert("Terjadi kesalahan saat membuat PDF. Cek console log.");
-    }
-  };
-
-
 
 
 

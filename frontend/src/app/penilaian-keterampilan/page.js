@@ -53,15 +53,19 @@ export default function PenilaianPage() {
         fetchPerawat();
     }, []);
 
-    const handlePerawatChange = (e) => {
-        const npk = e.target.value;
-        const selected = perawatList.find((p) => p.npk === npk);
+    const handlePerawatChange = (option) => {
+        const selected = perawatList.find((p) => p.npk === option.value);
         if (selected) {
             setSelectedNpk(selected.npk);
             setSelectedUnit(selected.unit || "-");
             setSelectedNama(selected.username || "-");
+        } else {
+            setSelectedNpk("");
+            setSelectedUnit("-");
+            setSelectedNama("-");
         }
     };
+
 
     const handleNilaiChange = (index, value) => {
         const updated = [...penilaian];
@@ -184,7 +188,11 @@ export default function PenilaianPage() {
             keterangan: ""
         })));
         setSubmitMessage({ type: '', text: '' });
+
+        // Tambahan untuk reset react-select
+        document.querySelector(".react-select__input")?.blur();
     };
+
 
     // Fungsi Simpan Draft
     const handleSaveDraft = async () => {
@@ -284,16 +292,35 @@ export default function PenilaianPage() {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Nama Perawat</label>
-                            <select
-                                value={selectedNpk}
+                            <Select
+                                options={perawatList.map((p) => ({
+                                    value: p.npk,
+                                    label: p.username
+                                }))}
                                 onChange={handlePerawatChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
-                            >
-                                <option value="">Pilih Perawat</option>
-                                {perawatList.map((p) => (
-                                    <option key={p.npk} value={p.npk}>{p.username}</option>
-                                ))}
-                            </select>
+                                placeholder="Cari nama perawat..."
+                                isSearchable
+                                className="text-gray-900"
+                                styles={{
+                                    control: (base, state) => ({
+                                        ...base,
+                                        padding: '4px',
+                                        borderRadius: '0.5rem',
+                                        borderColor: state.isFocused ? '#3B82F6' : '#D1D5DB', // biru saat fokus
+                                        boxShadow: state.isFocused ? '0 0 0 2px #93C5FD' : 'none',
+                                        '&:hover': { borderColor: '#3B82F6' },
+                                    }),
+                                    option: (base, state) => ({
+                                        ...base,
+                                        backgroundColor: state.isSelected
+                                            ? '#3B82F6'
+                                            : state.isFocused
+                                                ? '#DBEAFE'
+                                                : 'white',
+                                        color: state.isSelected ? 'white' : '#111827',
+                                    }),
+                                }}
+                            />
                         </div>
                     </div>
 
@@ -503,8 +530,8 @@ export default function PenilaianPage() {
                     {/* Status Message */}
                     {submitMessage.text && (
                         <div className={`mb-4 p-4 rounded-lg ${submitMessage.type === 'success'
-                                ? 'bg-green-50 text-green-700 border border-green-200'
-                                : 'bg-red-50 text-red-700 border border-red-200'
+                            ? 'bg-green-50 text-green-700 border border-green-200'
+                            : 'bg-red-50 text-red-700 border border-red-200'
                             }`}>
                             {submitMessage.text}
                         </div>
