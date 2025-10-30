@@ -212,49 +212,31 @@ export default function KepalaUnitDashboard() {
           </div>
         </section>
 
-        {/* Section 3: Ujian - Maintenance Mode */}
-        <section className="mb-10 relative">
+        {/* Section 3: Ujian - Enhanced */}
+        <section className="mb-10">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
               <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-2.5 shadow-md">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
               </div>
               <div>
                 <h2 className="text-xl font-bold text-gray-800">Manajemen Ujian</h2>
-                <p className="text-sm text-gray-600">
-                  Sedang dalam perbaikan ⚙️
-                </p>
+                <p className="text-sm text-gray-600">Buat, kelola, dan mulai ujian perawat</p>
               </div>
             </div>
             <span className="hidden sm:inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
-              Maintenance
+              4 Menu
             </span>
           </div>
-
-          {/* Overlay Transparan */}
-          <div className="relative opacity-50 pointer-events-none">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              <CardItem image="/starting.png" title="Mulai Ujian" />
-              <CardItem image="/buat-soal.png" title="Form Pembuatan Ujian" />
-              <CardItem image="/books.png" title="Batch Soal Ujian" />
-              <CardItem image="/ujian-selesai.png" title="Hasil Ujian" />
-            </div>
-          </div>
-
-          {/* Pesan Maintenance */}
-          <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-2xl">
-            <div className="text-center">
-              <svg className="mx-auto mb-3 w-12 h-12 text-blue-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v4m0 8v4m8-8h4M4 12H0m17.657-5.657l2.828 2.828M3.515 3.515l2.828 2.828M17.657 17.657l2.828-2.828M3.515 20.485l2.828-2.828" />
-              </svg>
-              <h3 className="text-lg font-semibold text-gray-800">Fitur Sedang Dalam Pemeliharaan</h3>
-              <p className="text-sm text-gray-600">Mohon maaf, fitur Manajemen Ujian belum bisa diakses saat ini.</p>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <CardItem image="/starting.png" title="Mulai Ujian" href="/ujian/create" />
+            <CardItem image="/buat-soal.png" title="Form Pembuatan Ujian" href="/ujian/batchsoal/create" />
+            <CardItem image="/books.png" title="Batch Soal Ujian" href="/ujian/batchsoal/" />
+            <CardItem image="/ujian-selesai.png" title="Hasil Ujian" href="/dashboard/kepala-unit/submission" />
           </div>
         </section>
-
 
         {/* Section 4: Dokumen Perawat - Enhanced */}
         <section className="mb-10">
