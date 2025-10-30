@@ -18,7 +18,6 @@ export const createOrUpdatePenilaian = async (req, res) => {
             total_penguji1,
             total_penguji2,
             status,
-            locked_by,
         } = req.body;
 
         const currentUserNpk = req.user.npk;
@@ -51,90 +50,75 @@ export const createOrUpdatePenilaian = async (req, res) => {
 
         if (existing) {
             // ======================================================
-            // UPDATE PENILAIAN
+            // UPDATE PENILAIAN YANG SUDAH ADA
             // ======================================================
 
             if (existing.status === "final") {
-                return res
-                    .status(400)
-                    .json({ success: false, message: "Penilaian sudah final" });
+                return res.status(400).json({
+                    success: false,
+                    message: "Penilaian sudah final"
+                });
             }
 
-            const updateData = {};
-
-            // ==============================
-            // CLAIM SLOT (jika diminta)
-            // ==============================
-            const wantClaim = req.query.claim === "1";
-            const claimSlot = req.query.slot; // "1" atau "2"
-
+            // Tentukan role user saat ini
             const isUserPenguji1 = existing.penguji1_npk === currentUserNpk;
             const isUserPenguji2 = existing.penguji2_npk === currentUserNpk;
 
-            if (wantClaim) {
-                if (!isUserPenguji1 && !isUserPenguji2) {
-                    if (claimSlot === "1" && !existing.penguji1_npk) {
-                        updateData.penguji1_npk = currentUserNpk;
-                    } else if (claimSlot === "2" && !existing.penguji2_npk) {
-                        updateData.penguji2_npk = currentUserNpk;
-                    } else {
-                        return res.status(409).json({
-                            success: false,
-                            message: "Slot penguji tidak tersedia atau sudah terisi",
-                        });
-                    }
+            // AUTO-ASSIGN: Jika user belum menjadi penguji, assign ke slot yang kosong
+            let updateData = {};
+            let autoAssigned = false;
+
+            if (!isUserPenguji1 && !isUserPenguji2) {
+                if (!existing.penguji1_npk) {
+                    updateData.penguji1_npk = currentUserNpk;
+                    autoAssigned = true;
+                } else if (!existing.penguji2_npk) {
+                    updateData.penguji2_npk = currentUserNpk;
+                    autoAssigned = true;
                 }
             }
 
-            // ==============================
-            // VALIDASI AKSES EDIT
-            // ==============================
-            if (nilai_penguji1 !== undefined && !isUserPenguji1) {
+            else if (!existing.penguji2_npk && !isUserPenguji1) {
+                updateData.penguji2_npk = currentUserNpk;
+                autoAssigned = true;
+            }
+
+            // VALIDASI AKSES EDIT NILAI
+            if (nilai_penguji1 !== undefined && !isUserPenguji1 && !autoAssigned) {
                 return res.status(403).json({
                     success: false,
                     message: "Anda tidak memiliki akses untuk mengedit nilai Penguji 1",
                 });
             }
 
-            if (nilai_penguji2 !== undefined && !isUserPenguji2) {
+            if (nilai_penguji2 !== undefined && !isUserPenguji2 && !autoAssigned) {
                 return res.status(403).json({
                     success: false,
                     message: "Anda tidak memiliki akses untuk mengedit nilai Penguji 2",
                 });
             }
 
-            // Kunci form hanya boleh diedit oleh yang memiliki lock
-            if (
-                existing.locked_by &&
-                existing.locked_by !== currentUserNpk &&
-                (nilai_penguji1 !== undefined || nilai_penguji2 !== undefined)
-            ) {
-                return res.status(423).json({
-                    success: false,
-                    message: "Form sedang dikunci oleh user lain",
-                });
-            }
-
-            // ==============================
-            // UPDATE NILAI & STATUS
-            // ==============================
+            // UPDATE DATA
             if (nilai_penguji1 !== undefined) updateData.nilai_penguji1 = nilai_penguji1;
             if (nilai_penguji2 !== undefined) updateData.nilai_penguji2 = nilai_penguji2;
             if (total_penguji1 !== undefined) updateData.total_penguji1 = total_penguji1;
             if (total_penguji2 !== undefined) updateData.total_penguji2 = total_penguji2;
-            if (locked_by !== undefined) updateData.locked_by = locked_by;
 
-            // Ubah status otomatis sesuai progres
-            if (nilai_penguji1 !== undefined && isUserPenguji1)
+            // Update status otomatis
+            if (nilai_penguji1 !== undefined && isUserPenguji1) {
                 updateData.status = "penguji1_selesai";
-            if (nilai_penguji2 !== undefined && isUserPenguji2)
-                updateData.status = "penguji2_selesai";
+            }
+            if (nilai_penguji2 !== undefined && isUserPenguji2) {
+                updateData.status = "penguji2_selesai"; // ✅ PERBAIKAN
+            }
+
             if (status) updateData.status = status;
 
             result = await existing.update(updateData);
+
         } else {
             // ======================================================
-            // CREATE PENILAIAN BARU
+            // CREATE PENILAIAN BARU - User pertama otomatis jadi Penguji 1
             // ======================================================
             result = await PenilaianPresentasi.create({
                 perawat_npk,
@@ -145,9 +129,8 @@ export const createOrUpdatePenilaian = async (req, res) => {
                 total_penguji1: total_penguji1 || null,
                 total_penguji2: total_penguji2 || null,
                 status: "draft",
-                penguji1_npk: currentUserNpk, // user pertama otomatis penguji1
+                penguji1_npk: currentUserNpk, // Creator otomatis jadi Penguji 1
                 penguji2_npk: null,
-                locked_by: locked_by || null,
             });
         }
 

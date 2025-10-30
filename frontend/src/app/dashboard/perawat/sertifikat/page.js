@@ -146,18 +146,15 @@ export default function SertifikatPage() {
     formData.append("file", sertifikat.file);
 
     try {
+      const token = localStorage.getItem("token"); // ✅ Ambil token
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sertifikat`, {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ Tambahkan headers
+        },
         body: formData,
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Upload gagal");
-      }
-
-      const result = await response.json();
-      return result;
+      // ...
     } catch (error) {
       throw error;
     }

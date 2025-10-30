@@ -12,45 +12,7 @@ export default function KepalaUnitDashboard() {
   const [greetingIndex, setGreetingIndex] = useState(0);
 
   // Array sapaan multibahasa
-  const greetings = [
-    "Hello",
-    "こんにちは",
-    "Bonjour",
-    "Hola",
-    "Ciao",
-    "안녕하세요",
-    "Namaste",
-    "Guten Tag",
-    "你好",
-    "Olá",
-    "Привет",
-    "Merhaba",
-    "สวัสดี",
-    "As-salamu alaykum",
-    "Jambo",
-    "Aloha",
-    "Kia ora",
-    "Hej",
-    "Dobrý den",
-    "Dzień dobry",
-    "Γεια σας",
-    "Buna ziua",
-    "Zdravo",
-    "Xin chào",
-    "Sabaidee",
-    "Mingalaba",
-    "Vanakkam",
-    "Talofa",
-    "Mālō e lelei",
-    "Sawubona",
-    "Molo",
-    "Tere",
-    "Tungjatjeta",
-    "Sain baina uu?",
-    "Chào bạn",
-    "Apa khabar?",
-    "Halo"
-  ];
+  const greetings = [ "Hello", "こんにちは", "Bonjour", "Hola", "Ciao", "안녕하세요", "Namaste", "Guten Tag", "你好", "Olá", "Привет", "Merhaba", "สวัสดี", "As-salamu alaykum", "Jambo", "Aloha", "Kia ora", "Hej", "Dobrý den", "Dzień dobry", "Γεια σας", "Buna ziua", "Zdravo", "Xin chào", "Sabaidee", "Mingalaba", "Vanakkam", "Talofa", "Mālō e lelei", "Sawubona", "Molo", "Tere", "Tungjatjeta", "Sain baina uu?", "Chào bạn", "Apa khabar?", "Halo" ];
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
@@ -222,13 +184,7 @@ export default function KepalaUnitDashboard() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             <CardItem image="/keterampilan-scoring.webp" title="Penilaian Keterampilan" href="/penilaian-keterampilan/" />
-            <div className="relative opacity-60 cursor-not-allowed">
-              <CardItem image="/presentation.webp" title="Penilaian Presentasi" href="/penilaian-presentasi/"/>
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-white font-semibold text-sm rounded-xl">
-                <span>🚧 Dalam Perbaikan</span>
-                <span className="text-xs font-normal">Masih banyak bug</span>
-              </div>
-            </div>
+            <CardItem image="/presentation.webp" title="Penilaian Presentasi" href="/penilaian-presentasi/"/>
           </div>
         </section>
 

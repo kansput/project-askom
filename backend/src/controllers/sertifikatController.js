@@ -6,9 +6,18 @@ import { User } from "../models/index.js";
 // Helper path publik
 const makePublicPath = (filePath) => {
   if (!filePath) return null;
-  return filePath.replace(/\\/g, "/").replace(/^src\//, "");
-};
 
+  // Normalize path separator
+  const normalized = filePath.replace(/\\/g, "/");
+
+  // Extract relative path from uploads folder
+  const uploadsIndex = normalized.indexOf("uploads/");
+  if (uploadsIndex !== -1) {
+    return normalized.substring(uploadsIndex + "uploads/".length);
+  }
+
+  return normalized;
+};
 // CREATE
 export const createSertifikat = async (req, res) => {
   try {

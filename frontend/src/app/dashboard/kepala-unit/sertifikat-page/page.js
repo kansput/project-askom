@@ -23,7 +23,7 @@ export default function SertifikatKepalaUnitPage() {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   // helper untuk URL & nama file
   const toFileUrl = (p) =>
-    p ? `${process.env.NEXT_PUBLIC_API_URL}/${p}`.replace(/([^:]\/)\/+/g, "$1") : null;
+    p ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/${p}`.replace(/([^:]\/)\/+/g, "$1") : null;
   const fileNameOf = (p) => (p ? decodeURIComponent(p.split("/").pop()) : "file");
 
 
