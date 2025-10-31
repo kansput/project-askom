@@ -8,7 +8,6 @@ import User from "../models/userModel.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Format ke yyyymmdd (buat password default)
 function yyyymmdd(date) {
   if (!(date instanceof Date) || isNaN(date)) return null;
   const y = date.getFullYear().toString().padStart(4, "0");
@@ -17,7 +16,6 @@ function yyyymmdd(date) {
   return `${y}${m}${d}`;
 }
 
-// Parse tanggal dari Excel (serial number atau string/Date)
 function parseExcelDate(d) {
   if (typeof d === "number") {
     const parsed = XLSX.SSF.parse_date_code(d);
@@ -28,40 +26,50 @@ function parseExcelDate(d) {
   return isNaN(dateObj) ? null : dateObj;
 }
 
+function normalizeRow(row) {
+  const normalized = {};
+  for (const key in row) {
+    const cleanKey = key.trim().toLowerCase().replace(/\s+/g, "");
+    normalized[cleanKey] = row[key];
+  }
+  return normalized;
+}
+
 async function run() {
   try {
     await sequelize.authenticate();
     console.log("✅ DB Connected");
 
-    const file = path.join(__dirname, "../data/mitra_clean.xlsx");
+    const file = path.join(__dirname, "../data/user_baru.xlsx");
     const wb = XLSX.readFile(file);
     const ws = wb.Sheets[wb.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(ws, { defval: null });
 
     const batch = [];
 
-    for (const r of rows) {
-      const npk = r["NPK"]?.toString().trim();
-      const username = (r["NAMA"] || "").toString().trim();
+    for (const raw of rows) {
+      const r = normalizeRow(raw); // 👉 normalisasi header
+
+      const npk = r["npk"]?.toString().trim();
+      const username = (r["username"] || "").toString().trim();
 
       if (!npk || !username) {
-        console.log("⏩ Skip row (missing NPK/NAMA):", r);
+        console.log("⏩ Skip row (missing NPK/USERNAME):", r);
         continue;
       }
 
-      const unit = r["UNIT"] || null;
-      const jenjangKarir = r["JENJANGKARIR"] || null;
-      const role = (r["ROLE"] || "kepala unit").toLowerCase();
+      const unit = r["unit"] || null;
+      const areaKlinis = r["areaklinis"] || null; // ✅ otomatis cocok walau "Area Klinis "
+      const jenjangKarir = r["jenjangkarir"] || null;
+      const role = (r["role"] || "kepala unit").toLowerCase();
 
-      // Ambil tanggal lahir
-      const dobRaw = r["TANGGALLAHIR"];
+      const dobRaw = r["tanggallahir"];
       const dob = parseExcelDate(dobRaw);
       if (!dob) {
         console.log("⏩ Skip row (invalid TANGGALLAHIR):", r);
         continue;
       }
 
-      // Password default dari tanggal lahir
       const plainPwd = yyyymmdd(dob);
       if (!plainPwd) {
         console.log("⏩ Skip row (invalid password date):", r);
@@ -77,6 +85,7 @@ async function run() {
         password: hashed,
         role,
         unit,
+        areaKlinis,
         jenjangKarir,
         tanggalLahir: dob,
         mustChangePassword: true,

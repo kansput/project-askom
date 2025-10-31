@@ -11,13 +11,7 @@ export default function MitraBestariDashboard() {
   const [user, setUser] = useState(null);
   const [greetingIndex, setGreetingIndex] = useState(0);
 
-  const greetings = [
-    "Hello", "こんにちは", "Bonjour", "Hola", "Ciao", "안녕하세요", "Namaste", "Guten Tag",
-    "你好", "Olá", "Привет", "Merhaba", "สวัสดี", "As-salamu alaykum", "Jambo", "Aloha",
-    "Kia ora", "Hej", "Dobrý den", "Dzień dobry", "Γεια σας", "Buna ziua", "Zdravo",
-    "Xin chào", "Sabaidee", "Mingalaba", "Vanakkam", "Talofa", "Mālō e lelei", "Sawubona",
-    "Molo", "Tere", "Tungjatjeta", "Sain baina uu?", "Chào bạn", "Apa kabar?", "Halo"
-  ];
+  const greetings = [ "Hello", "こんにちは", "Bonjour", "Hola", "Ciao", "안녕하세요", "Namaste", "Guten Tag", "你好", "Olá", "Привет", "Merhaba", "สวัสดี", "As-salamu alaykum", "Jambo", "Aloha", "Kia ora", "Hej", "Dobrý den", "Dzień dobry", "Γεια σας", "Buna ziua", "Zdravo", "Xin chào", "Sabaidee", "Mingalaba", "Vanakkam", "Talofa", "Mālō e lelei", "Sawubona", "Molo", "Tere", "Tungjatjeta", "Sain baina uu?", "Chào bạn", "Apa kabar?", "Halo" ];
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");

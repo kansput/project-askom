@@ -2,15 +2,16 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 
-const UNIT_OPTIONS = [ "AUDIT INTERNAL", "PAP", "IRJ", "ANASTESI", "IGNATIUS", "BPMKP", "IMMANUEL", "K3RS", "MCU", "CAROLUS", "TUGAS BELAJAR", "PRESEPTORSHIP", "LUKAS", "CASE MANAJER", "HR OPERASIONAL", "PKR", "KAMAR BEDAH (ok)", "FRANSISKUS-MARIA", "LIOBA", "ELISABETH", "ENDOSKOPI", "RADIOLOGI", "DIALISIS", "YACINTA", "KOMITE KEPERAWATAN", "DAMIANUS", "PKRS", "YOSEPH", "STERILISASI", "IGD", "PPI", "THERESIA", "XAVERIUS", "GORETY", "CICC", "YOHANES", "CARLO", "REHAB MEDIK", "BIDANG KEP", "JAMINAN" ]
-const AREA_KLINIS_OPTIONS = [ "AUDIT INTERNAL", "IRJ", "ANASTESI", "IMMANUEL", "KAMAR BEDAH", "MUTU", "PSIKIATRI", "KEMOTERAPI", "ENDOSKOPI", "RADIOLOGI", "DIALISIS", "IPI DEWASA", "BPPRS", "MATERNITAS", "IPI ANAK", "ANAK", "IGD", "PPI", "MEDIKAL BEDAH", "CICC", "KESPAS", "REHAB MEDIK" ];
-const JENJANG_KARIR_OPTIONS = [ "PRA PK", "PK I", "PK II", "PK III", "PK IV", "PKWT", "BP I", "BP II", "BP III" ]
+const UNIT_OPTIONS = ["AUDIT INTERNAL", "PAP", "IRJ", "ANASTESI", "IGNATIUS", "BPMKP", "IMMANUEL", "K3RS", "MCU", "CAROLUS", "TUGAS BELAJAR", "PRESEPTORSHIP", "LUKAS", "CASE MANAJER", "HR OPERASIONAL", "PKR", "KAMAR BEDAH (ok)", "FRANSISKUS-MARIA", "LIOBA", "ELISABETH", "ENDOSKOPI", "RADIOLOGI", "DIALISIS", "YACINTA", "KOMITE KEPERAWATAN", "DAMIANUS", "PKRS", "YOSEPH", "STERILISASI", "IGD", "PPI", "THERESIA", "XAVERIUS", "GORETY", "CICC", "YOHANES", "CARLO", "REHAB MEDIK", "BIDANG KEP", "JAMINAN"]
+const AREA_KLINIS_OPTIONS = ["AUDIT INTERNAL", "IRJ", "ANASTESI", "IMMANUEL", "KAMAR BEDAH", "MUTU", "PSIKIATRI", "KEMOTERAPI", "ENDOSKOPI", "RADIOLOGI", "DIALISIS", "IPI DEWASA", "BPPRS", "MATERNITAS", "IPI ANAK", "ANAK", "IGD", "PPI", "MEDIKAL BEDAH", "CICC", "KESPAS", "REHAB MEDIK"];
+const JENJANG_KARIR_OPTIONS = ["PRA PK", "PK I", "PK II", "PK III", "PK IV", "PKWT", "BP I", "BP II", "BP III"]
 
 export default function EditPerawatDialog({ perawat, onClose, onSave }) {
   const [formData, setFormData] = useState({
     unit: perawat?.unit || "",
     areaKlinis: perawat?.areaKlinis || "",
     jenjangKarir: perawat?.jenjangKarir || "",
+    role: perawat?.role || "",
   });
 
   const [errors, setErrors] = useState({});
@@ -149,6 +150,24 @@ export default function EditPerawatDialog({ perawat, onClose, onSave }) {
               </p>
             )}
           </div>
+
+          {/* Role Field */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
+              Role <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="role"
+              value={formData.role || perawat?.role || ""}
+              onChange={handleChange}
+              className="w-full border rounded-lg px-4 py-2.5 text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="" className="text-gray-500">Pilih Role</option>
+              <option value="perawat">Perawat</option>
+              <option value="mitra bestari">mitra bestari</option>
+            </select>
+          </div>
+
 
           {/* Footer */}
           <div className="flex justify-end gap-3 pt-2">
