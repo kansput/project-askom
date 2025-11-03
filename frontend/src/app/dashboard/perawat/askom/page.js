@@ -23,6 +23,11 @@ export default function AskomPage() {
   const [showExitWarning, setShowExitWarning] = useState(false);
   const [tabSwitchCount, setTabSwitchCount] = useState(0);
   const [showTabWarning, setShowTabWarning] = useState(false);
+  const exitAttemptsRef = useRef(0);
+
+  useEffect(() => {
+    exitAttemptsRef.current = exitAttempts;
+  }, [exitAttempts]);
 
   const examContainerRef = useRef(null);
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : "";
@@ -89,7 +94,7 @@ export default function AskomPage() {
       return true;
     } catch (err) {
       console.error("Fullscreen error:", err);
-      alert("⚠️ Gagal masuk fullscreen. Izinkan di browser.");
+      alert(" Gagal masuk fullscreen. Izinkan di browser.");
       return false;
     }
   }, []);
@@ -107,6 +112,35 @@ export default function AskomPage() {
 
   const handleReEnterFromWarning = () => enterFullscreen();
 
+  const handleJawab = (soalId, pilihan) => setJawaban((prev) => ({ ...prev, [soalId]: pilihan }));
+
+  const handleSubmit = useCallback(async (autoSubmit = false) => {
+    setIsSubmitting(true);
+    setShowConfirmModal(false);
+    setShowExitWarning(false);
+    exitFullscreen();
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ujian/${ujian?.id}/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ jawaban, exitAttempts, tabSwitchCount }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(autoSubmit ? "⏰ Waktu habis!" : "✅ Ujian disubmit!");
+        router.push("/dashboard");
+      } else {
+        alert("❌ Gagal submit: " + data.message);
+      }
+    } catch (err) {
+      console.error("Submit error:", err);
+      alert("Kesalahan submit ujian.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [token, ujian?.id, jawaban, exitAttempts, tabSwitchCount, router, exitFullscreen]);
+
   // Fullscreen change handler
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -118,15 +152,16 @@ export default function AskomPage() {
       if (!isNowFullscreen && !isSubmitting && examStarted) {
         setExitAttempts((prev) => {
           const newAttempts = prev + 1;
-          if (newAttempts === 1) alert("⚠️ Jangan keluar fullscreen! Kembali sekarang.");
+          if (newAttempts === 1) alert("Jangan keluar fullscreen! Kembali sekarang.");
           return newAttempts;
         });
         setShowExitWarning(true);
 
-        if (exitAttempts >= 2) {
+        // Ganti exitAttempts >= 2 jadi pakai ref
+        if (exitAttemptsRef.current >= 2) {
           setTimeout(() => {
-            if (!isFullscreen) {
-              alert("❌ Terlalu banyak percobaan. Ujian disubmit otomatis!");
+            if (!isNowFullscreen) {
+              alert("Terlalu banyak percobaan. Ujian disubmit otomatis!");
               handleSubmit(true);
             }
           }, 3000);
@@ -144,7 +179,7 @@ export default function AskomPage() {
       document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
       document.removeEventListener("msfullscreenchange", handleFullscreenChange);
     };
-  }, [isSubmitting, examStarted, exitAttempts, handleSubmit, isFullscreen, showExitWarning]);
+  }, [isSubmitting, examStarted, isFullscreen, showExitWarning, handleSubmit]);
 
   // Tab visibility, disable shortcuts (copy dari detail page)
   useEffect(() => {
@@ -214,34 +249,7 @@ export default function AskomPage() {
     return `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const handleJawab = (soalId, pilihan) => setJawaban((prev) => ({ ...prev, [soalId]: pilihan }));
 
-  const handleSubmit = useCallback(async (autoSubmit = false) => {
-    setIsSubmitting(true);
-    setShowConfirmModal(false);
-    setShowExitWarning(false);
-    exitFullscreen();
-
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ujian/${ujian?.id}/submit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ jawaban, exitAttempts, tabSwitchCount }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert(autoSubmit ? "⏰ Waktu habis!" : "✅ Ujian disubmit!");
-        router.push("/dashboard");
-      } else {
-        alert("❌ Gagal submit: " + data.message);
-      }
-    } catch (err) {
-      console.error("Submit error:", err);
-      alert("Kesalahan submit ujian.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [token, ujian?.id, jawaban, exitAttempts, tabSwitchCount, router, exitFullscreen]);
 
   const getProgressPercentage = () => (soalList.length === 0 ? 0 : (Object.keys(jawaban).length / soalList.length) * 100);
 
@@ -497,13 +505,12 @@ export default function AskomPage() {
                     <button
                       key={soal.id}
                       onClick={() => setCurrentSoal(index)}
-                      className={`w-10 h-10 rounded-lg font-semibold transition-all ${
-                        currentSoal === index
-                          ? "bg-blue-600 text-white ring-2 ring-blue-400 scale-110"
-                          : jawaban[soal.id]
+                      className={`w-10 h-10 rounded-lg font-semibold transition-all ${currentSoal === index
+                        ? "bg-blue-600 text-white ring-2 ring-blue-400 scale-110"
+                        : jawaban[soal.id]
                           ? "bg-green-600 text-white hover:bg-green-700"
                           : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                      }`}
+                        }`}
                     >
                       {index + 1}
                     </button>
@@ -535,13 +542,11 @@ export default function AskomPage() {
                       <button
                         key={pilihan}
                         onClick={() => handleJawab(currentSoalData.id, pilihan)}
-                        className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 flex items-start gap-4 ${
-                          isSelected ? "bg-blue-600 border-blue-400 text-white shadow-lg" : "bg-gray-700 border-gray-600 hover:bg-gray-600 hover:border-gray-500"
-                        }`}
+                        className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 flex items-start gap-4 ${isSelected ? "bg-blue-600 border-blue-400 text-white shadow-lg" : "bg-gray-700 border-gray-600 hover:bg-gray-600 hover:border-gray-500"
+                          }`}
                       >
-                        <div className={`w-6 h-6 rounded-full flex-shrink-0 mt-1 flex items-center justify-center font-bold text-sm ${
-                          isSelected ? "bg-white text-blue-600" : "bg-gray-600 text-white"
-                        }`}>
+                        <div className={`w-6 h-6 rounded-full flex-shrink-0 mt-1 flex items-center justify-center font-bold text-sm ${isSelected ? "bg-white text-blue-600" : "bg-gray-600 text-white"
+                          }`}>
                           {pilihan}
                         </div>
                         <div className="flex-1" dangerouslySetInnerHTML={{ __html: optionText }} />
