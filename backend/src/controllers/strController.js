@@ -18,10 +18,10 @@ export const createStrDocument = async (req, res) => {
       masaKerja: req.body.masaKerja,
       lamaNaikJenjang: req.body.lamaNaikJenjang,
       asalSekolah: req.body.asalSekolah,
-      
-       fileIjazah: req.files?.fileIjazah 
-    ? makePublicPath(req.files.fileIjazah[0].path) 
-    : null,
+
+      fileIjazah: req.files?.fileIjazah
+        ? makePublicPath(req.files.fileIjazah[0].path)
+        : null,
 
       nomorSTR: req.body.nomorSTR,
       tglBerakhirSTR: req.body.tglBerakhirSTR,
@@ -38,6 +38,9 @@ export const createStrDocument = async (req, res) => {
       nomorRKK: req.body.nomorRKK,
       rkkMasaBerlaku: req.body.rkkMasaBerlaku,
       masaBerlakuRKK: req.body.masaBerlakuRKK,
+      fileRKK: req.files?.fileRKK
+        ? makePublicPath(req.files.fileRKK[0].path)
+        : null,
 
       userId,
     };

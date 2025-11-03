@@ -149,7 +149,7 @@ export default function KredoRiwayatPage() {
         const deleteToast = toast.loading('Sedang menghapus dokumen...');
 
         try {
-            // ✅ PERBAIKAN: Gunakan full URL dengan environment variable
+            //  PERBAIKAN: Gunakan full URL dengan environment variable
             const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/kredokumen/${documentId}`;
             console.log("🗑️ Deleting document:", apiUrl);
 

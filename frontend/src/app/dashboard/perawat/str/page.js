@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import toast from "react-hot-toast";
 
 export default function StrSipPage() {
   const [formData, setFormData] = useState({});
@@ -37,7 +38,7 @@ export default function StrSipPage() {
     e.preventDefault();
 
     if (!formData.bulan) {
-      alert("⚠️ Pilih periode terlebih dahulu!");
+      toast.error("Pilih periode terlebih dahulu!");
       return;
     }
 
@@ -68,7 +69,7 @@ export default function StrSipPage() {
 
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("❌ Kamu belum login. Token tidak ditemukan.");
+        toast.error("Kamu belum login. Token tidak ditemukan.");
         setIsSubmitting(false);
         return;
       }
@@ -85,16 +86,16 @@ export default function StrSipPage() {
       console.log("Upload result:", data);
 
       if (data.success) {
-        alert("✅ Data berhasil diupload ke backend!");
+        toast.success("Data berhasil diupload ke backend!");
         setFormData({});
         setFiles({});
         e.target.reset();
       } else {
-        alert("❌ Upload gagal: " + data.message);
+        toast.error("Upload gagal: " + data.message);
       }
     } catch (err) {
       console.error("Error submit:", err);
-      alert("❌ Gagal upload, cek console untuk detail.");
+      toast.error("Gagal upload, cek console untuk detail.");
     } finally {
       setIsSubmitting(false);
     }
@@ -371,6 +372,20 @@ export default function StrSipPage() {
                   className="border border-gray-300 rounded-lg px-4 py-2.5 w-full bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
                 />
               </div>
+
+              <div>
+                <label className="block mb-2 font-medium text-gray-700">Upload File RKK</label>
+                <input
+                  type="file"
+                  name="fileRKK"
+                  onChange={handleFile}
+                  required
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  className="border border-gray-300 rounded-lg px-2 py-1 w-full bg-white text-gray-900 focus:border-blue-500 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-red-50 file:text-red-700 hover:file:bg-red-100 file:cursor-pointer transition"
+                />
+                <p className="text-xs text-gray-500 mt-1">Format: PDF, JPG, PNG (Max 5MB)</p>
+              </div>
+
             </div>
           </div>
 

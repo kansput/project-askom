@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { FileText, Download, Calendar, Award, ShieldCheck, Search, ChevronDown, ChevronUp, Filter, User, AlertCircle, Trash2 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
+import toastConfirm from "@/utils/toastConfirm";
 
 export default function StrRiwayatPage() {
     const router = useRouter();
@@ -18,7 +19,7 @@ export default function StrRiwayatPage() {
     const [deletingId, setDeletingId] = useState(null);
     const itemsPerPage = 10;
 
-   
+
 
     const fetchDocs = useCallback(async () => {
         try {
@@ -91,11 +92,13 @@ export default function StrRiwayatPage() {
     }, [fetchDocs]);
 
     const handleDelete = async (docId) => {
+        // 1. KONFIRMASI DULU (pakai confirm biasa)
         if (!confirm("Apakah Anda yakin ingin menghapus dokumen ini?")) {
-            return;
+            return; // Batal
         }
 
-        try {
+        // 2. Kalau ya, lanjut proses hapus dengan toast.promise
+        const deletePromise = async () => {
             setDeletingId(docId);
             const token = localStorage.getItem("token");
 
@@ -103,30 +106,37 @@ export default function StrRiwayatPage() {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                 },
             });
 
             if (!res.ok) {
-                const errorData = await res.json().catch(() => ({ message: "Gagal menghapus data" }));
-                throw new Error(errorData.message || `HTTP Error ${res.status}`);
+                const err = await res.json().catch(() => ({ message: "Gagal menghapus" }));
+                throw new Error(err.message || "Gagal menghapus dokumen");
             }
 
             const result = await res.json();
+            if (!result.success) throw new Error(result.message);
 
-            if (result.success) {
-                toast.success("✅ Dokumen berhasil dihapus");
-                // Refresh data setelah hapus
-                fetchDocs();
-            } else {
-                throw new Error(result.message || "Gagal menghapus dokumen");
+            // Refresh data
+            await fetchDocs();
+            return result;
+        };
+
+        // 3. Toast: loading → success / error
+        toast.promise(
+            deletePromise(),
+            {
+                loading: "Menghapus dokumen...",
+                success: "Dokumen berhasil dihapus!",
+                error: (err) => err.message,
+            },
+            {
+                style: { minWidth: '260px' },
+                success: { duration: 3000 },
+                error: { duration: 5000 },
             }
-        } catch (err) {
-            console.error("❌ Error deleting document:", err);
-            toast.error(`❌ ${err.message || "Gagal menghapus dokumen"}`);
-        } finally {
-            setDeletingId(null);
-        }
+        );
     };
 
     const handleSort = (key) => {
@@ -541,13 +551,26 @@ export default function StrRiwayatPage() {
                                                                 <Download className="w-4 h-4 text-purple-700" />
                                                             </a>
                                                         )}
+
+                                                        {doc.fileRKK && (
+                                                            <a
+                                                                href={`${process.env.NEXT_PUBLIC_API_URL}/${doc.fileRKK}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="p-2 bg-red-100 hover:bg-red-200 rounded transition"
+                                                                title="Download RKK"
+                                                            >
+                                                                <Download className="w-4 h-4 text-red-700" />
+                                                            </a>
+                                                        )}
+
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-3 whitespace-nowrap">
                                                     <button
                                                         onClick={() => handleDelete(doc.id)}
                                                         disabled={deletingId === doc.id}
-                                                        className="p-2 bg-red-100 hover:bg-red-200 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        className="p-2 bg-red-100 hover:bg-red-200 rounded transition disabled:opacity-50"
                                                         title="Hapus Dokumen"
                                                     >
                                                         {deletingId === doc.id ? (

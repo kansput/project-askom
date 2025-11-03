@@ -5,27 +5,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export default function SertifikatPage() {
-  const [sertifikatUmum, setSertifikatUmum] = useState([
-    {
-      id: 1,
-      judul: "",
-      tanggal: "",
-      penyelenggara: "",
-      file: null,
-      dragActive: false
-    }
-  ]);
+  const [sertifikatUmum, setSertifikatUmum] = useState([]);
 
-  const [sertifikatKhusus, setSertifikatKhusus] = useState([
-    {
-      id: 1,
-      judul: "",
-      tanggal: "",
-      penyelenggara: "",
-      file: null,
-      dragActive: false
-    }
-  ]);
+  const [sertifikatKhusus, setSertifikatKhusus] = useState([]);
 
   const [expandedUmum, setExpandedUmum] = useState(true);
   const [expandedKhusus, setExpandedKhusus] = useState(true);
@@ -59,7 +41,9 @@ export default function SertifikatPage() {
       return;
     }
 
-    const newId = Math.max(...list.map(s => s.id)) + 1;
+    // Gunakan ID berdasarkan panjang array + 1 (aman untuk array kosong)
+    const newId = list.length > 0 ? Math.max(...list.map(s => s.id)) + 1 : 1;
+
     setList([
       ...list,
       {
@@ -77,11 +61,17 @@ export default function SertifikatPage() {
     const list = type === "umum" ? sertifikatUmum : sertifikatKhusus;
     const setList = type === "umum" ? setSertifikatUmum : setSertifikatKhusus;
 
-    if (list.length === 1) {
-      alert("Minimal harus ada 1 sertifikat per kategori!");
+    const newList = list.filter(s => s.id !== id);
+
+    const otherList = type === "umum" ? sertifikatKhusus : sertifikatUmum;
+    const totalAfterDelete = newList.length + otherList.length;
+
+    if (totalAfterDelete === 0) {
+      alert("❌ Minimal harus ada 1 sertifikat (tidak boleh menghapus semua)!");
       return;
     }
-    setList(list.filter(s => s.id !== id));
+
+    setList(newList);
   };
 
   const updateSertifikat = (type, id, field, value) => {
@@ -161,18 +151,20 @@ export default function SertifikatPage() {
   };
 
   const handleSubmit = async () => {
-    // Validasi Sertifikat Umum
-    for (let i = 0; i < sertifikatUmum.length; i++) {
-      if (!validateSertifikat(sertifikatUmum[i], i, "Umum")) {
-        return;
-      }
+    const totalSertifikat = sertifikatUmum.length + sertifikatKhusus.length;
+
+    // Validasi: minimal 1 sertifikat total
+    if (totalSertifikat === 0) {
+      alert("❌ Minimal harus mengupload 1 sertifikat (Umum atau Khusus)!");
+      return;
     }
 
-    // Validasi Sertifikat Khusus
+    // Validasi setiap sertifikat yang ada
+    for (let i = 0; i < sertifikatUmum.length; i++) {
+      if (!validateSertifikat(sertifikatUmum[i], i, "Umum")) return;
+    }
     for (let i = 0; i < sertifikatKhusus.length; i++) {
-      if (!validateSertifikat(sertifikatKhusus[i], i, "Khusus")) {
-        return;
-      }
+      if (!validateSertifikat(sertifikatKhusus[i], i, "Khusus")) return;
     }
 
     setIsSubmitting(true);
@@ -436,9 +428,9 @@ export default function SertifikatPage() {
               <button
                 type="button"
                 onClick={() => addSertifikat(type)}
-                className={`w-full mt-3 px-4 py-3 bg-white border-2 border-dashed ${borderColor} ${iconColor} rounded-lg hover:bg-gray-50 transition-all font-semibold text-sm flex items-center justify-center gap-2 group`}
+                className={`w-full mt-3 px-4 py-3 ...`}
               >
-                <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <Plus className="..." />
                 Tambah {title} ({list.length}/10)
               </button>
             )}

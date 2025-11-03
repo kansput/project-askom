@@ -33,6 +33,7 @@ const StrDocument = sequelize.define(
     nomorRKK: { type: DataTypes.STRING },
     rkkMasaBerlaku: { type: DataTypes.STRING },
     masaBerlakuRKK: { type: DataTypes.DATE },
+    fileRKK: { type: DataTypes.STRING },
 
     // Metadata
     userId: { type: DataTypes.INTEGER },

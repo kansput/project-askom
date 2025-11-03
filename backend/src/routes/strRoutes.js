@@ -21,6 +21,7 @@ router.post(
     { name: "fileIjazah", maxCount: 1 },
     { name: "fileSTR", maxCount: 1 },
     { name: "fileSIP", maxCount: 1 },
+    { name: "fileRKK", maxCount: 1 },
   ]),
   createStrDocument
 );
