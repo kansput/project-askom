@@ -637,14 +637,21 @@ export default function DaftarPerawatPage() {
           <span className="text-blue-600">📋</span> Daftar Perawat
         </h2>
 
-        {typeof window !== "undefined" && localStorage.getItem("role") === "kepala unit" && (
-          <button
-            onClick={() => setShowAddDialog(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-all"
-          >
-            + Tambah Perawat
-          </button>
-        )}
+        {typeof window !== "undefined" && (() => {
+          try {
+            const userData = JSON.parse(localStorage.getItem("user"));
+            return userData?.role === "kepala unit";
+          } catch {
+            return false;
+          }
+        })() && (
+            <button
+              onClick={() => setShowAddDialog(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-all"
+            >
+              + Tambah Perawat
+            </button>
+          )}
       </div>
 
       {/* List Section */}
