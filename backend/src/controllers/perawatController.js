@@ -59,20 +59,20 @@ export const deletePerawat = async (req, res) => {
       });
     }
 
-    console.log(`🗑️ Found perawat to delete: ${user.username} (${user.npk})`);
+    console.log(` Found perawat to delete: ${user.username} (${user.npk})`);
 
     // Coba hapus dengan error handling yang lebih spesifik
     try {
       await user.destroy();
 
-      console.log(`✅ Successfully deleted perawat: ${user.username}`);
+      console.log(`Successfully deleted perawat: ${user.username}`);
 
       return res.json({
         success: true,
         message: "Perawat berhasil dihapus.",
       });
     } catch (error) {
-      console.error("❌ Database delete error:", error);
+      console.error(" Database delete error:", error);
 
       // Handle foreign key constraint error
       if (error.name === 'SequelizeForeignKeyConstraintError') {
@@ -196,7 +196,7 @@ export const createPerawat = async (req, res) => {
       });
     }
 
-    // ✅ HASH PASSWORD SEBELUM DISIMPAN
+    // HASH PASSWORD SEBELUM DISIMPAN
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Cek duplikat NPK
@@ -213,7 +213,7 @@ export const createPerawat = async (req, res) => {
       npk,
       username,
       email: email || null,
-      password: hashedPassword, // ✅ PAKAI PASSWORD YANG SUDAH DI-HASH
+      password: hashedPassword, // PAKAI PASSWORD YANG SUDAH DI-HASH
       role: role || "perawat",
       unit,
       areaKlinis,

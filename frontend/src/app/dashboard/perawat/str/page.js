@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 export default function StrSipPage() {
   const [formData, setFormData] = useState({});

@@ -90,7 +90,7 @@ export default function AddPerawatDialog({ onClose, onSave }) {
                 email: formData.email || null // kalau kosong, kirim null
             });
         } catch (err) {
-            console.error("❌ Gagal menambahkan:", err);
+            console.error(" Gagal menambahkan:", err);
             setError(err.message || "Terjadi kesalahan saat menyimpan data");
         } finally {
             setIsSubmitting(false);

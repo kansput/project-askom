@@ -182,7 +182,7 @@ export default function KepalaUnitDashboard() {
               2 Menu
             </span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-5">
             <CardItem image="/keterampilan-scoring.webp" title="Penilaian Keterampilan" href="/penilaian-keterampilan/" />
             <CardItem image="/presentation.webp" title="Penilaian Presentasi" href="/penilaian-presentasi/" />
           </div>
@@ -206,7 +206,7 @@ export default function KepalaUnitDashboard() {
               2 Menu
             </span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-5">
             <CardItem image="/keterampilan-hasil.webp" title="Hasil Penilaian Keterampilan" href="/hasil-keterampilan/" />
             <CardItem image="/presentation-hasil.webp" title="Hasil Penilaian Presentasi" href="/hasil-presentasi/" />
           </div>
@@ -230,9 +230,8 @@ export default function KepalaUnitDashboard() {
               4 Menu
             </span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5">
             <CardItem image="/starting.png" title="Mulai Ujian" href="/ujian/create" />
-            <CardItem image="/buat-soal.png" title="Form Pembuatan Soal Ujian" href="/ujian/batchsoal/create" />
             <CardItem image="/books.png" title="Batch Soal Ujian" href="/ujian/batchsoal/" />
             <CardItem image="/ujian-selesai.png" title="Hasil Ujian" href="/dashboard/kepala-unit/submission" />
           </div>
@@ -281,7 +280,7 @@ export default function KepalaUnitDashboard() {
               2 Menu
             </span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 gap-5">
             <CardItem image="/nurse.png" title="Daftar Perawat & Unit" href="/dashboard/kepala-unit/daftar-perawat" />
             <CardItem image="/file-center.png" title="File Center" href="/download/" />
           </div>

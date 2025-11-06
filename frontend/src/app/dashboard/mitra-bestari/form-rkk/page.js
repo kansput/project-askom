@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { toast } from "react-hot-toast";
 
 export default function UploadJadwalPage() {
   const [bulan, setBulan] = useState("");
@@ -10,11 +11,11 @@ export default function UploadJadwalPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!bulan || !file) {
-      alert("Pilih bulan dan upload file dulu!");
+      toast.error("Pilih bulan dan upload file dulu!");
       return;
     }
     console.log("Bulan:", bulan, "File:", file.name);
-    alert("Jadwal berhasil dipilih, nanti dihubungkan ke backend 🚀");
+    toast.success("Jadwal berhasil dipilih, nanti dihubungkan ke backend ");
   };
 
   return (

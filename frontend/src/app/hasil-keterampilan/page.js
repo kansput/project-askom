@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import jsPDF from "jspdf";
 import { handleExportPDF } from "@/utils/exportketerampilanPDF";
+import { toast } from "react-hot-toast";
 
 
 
@@ -95,15 +96,15 @@ export default function HasilPenilaianKeterampilanPage() {
       const result = await response.json();
 
       if (result.success) {
-        alert("Data penilaian berhasil dihapus!");
+        toast.success("Data penilaian berhasil dihapus!");
         // Refresh data
         fetchPenilaian();
       } else {
-        alert(result.message || "Gagal menghapus data penilaian");
+        toast.error(result.message || "Gagal menghapus data penilaian");
       }
     } catch (error) {
       console.error("Error deleting penilaian:", error);
-      alert("Terjadi kesalahan saat menghapus data");
+      toast.error("Terjadi kesalahan saat menghapus data");
     }
   };
 

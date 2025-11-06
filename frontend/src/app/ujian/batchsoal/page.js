@@ -3,19 +3,8 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
-import {
-  BookOpen,
-  Plus,
-  FileText,
-  Edit,
-  Eye,
-  Trash2,
-  Clock,
-  Calendar,
-  AlertCircle,
-  Loader2,
-} from "lucide-react";
-import toast from "react-hot-toast";
+import { BookOpen, Plus, FileText, Edit, Eye, Trash2, Clock, Calendar, AlertCircle, Loader2, } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export default function BatchSoalListPage() {
   const [batchList, setBatchList] = useState([]);
@@ -302,7 +291,7 @@ export default function BatchSoalListPage() {
         )}
       </main>
 
-      {/* ✅ Render ConfirmModal */}
+      {/*  Render ConfirmModal */}
       {showConfirm && (
         <ConfirmModal
           message={confirmMessage}

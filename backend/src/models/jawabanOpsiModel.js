@@ -1,4 +1,4 @@
-// models/jawabanOpsiModel.js
+//jawabanOpsiModel.js
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
@@ -71,7 +71,5 @@ const JawabanOpsi = sequelize.define("JawabanOpsi", {
     }
   ]
 });
-
-
 
 export default JawabanOpsi;

@@ -6,7 +6,7 @@ import path from "path";
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         try {
-            const userId = req.user?.id; // ✅ dari token
+            const userId = req.user?.id; 
             if (!userId) return cb(new Error("userId tidak ditemukan dari token"), null);
 
             const folderName = `user_${userId}`;

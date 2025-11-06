@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 
 export default function CreateUjianPage() {
@@ -158,7 +158,7 @@ export default function CreateUjianPage() {
         // pastikan state ujian null supaya form tetap kelihatan
         setUjian(null);
 
-        toast.success("✓ Ujian berhasil dibuat sebagai draft");
+        toast.success(" Ujian berhasil dibuat sebagai draft");
       } else {
         toast.error(data.message || "Gagal membuat ujian");
       }
@@ -189,7 +189,7 @@ export default function CreateUjianPage() {
 
       if (data.success) {
         setUjianList((prev) => prev.filter((u) => u.id !== id));
-        toast.success("✓ Draft ujian berhasil dihapus!");
+        toast.success(" Draft ujian berhasil dihapus!");
       } else {
         toast.error(data.message || "Gagal menghapus draft");
       }
@@ -220,7 +220,7 @@ export default function CreateUjianPage() {
         setUjianList((prev) =>
           prev.map((u) => (u.id === id ? { ...u, status: "active" } : u))
         );
-        toast.success("✓ Ujian sudah dimulai!");
+        toast.success(" Ujian sudah dimulai!");
       } else {
         toast.error(data.message || "Gagal memulai ujian");
       }
@@ -251,7 +251,7 @@ export default function CreateUjianPage() {
         setUjianList((prev) =>
           prev.map((u) => (u.id === id ? { ...u, status: "closed" } : u))
         );
-        toast.success("✓ Ujian berhasil dihentikan!");
+        toast.success(" Ujian berhasil dihentikan!");
       } else {
         toast.error(data.message || "Gagal menghentikan ujian");
       }
@@ -565,14 +565,7 @@ export default function CreateUjianPage() {
                     Judul Ujian
                     <span className="text-red-500 ml-1">*</span>
                   </label>
-                  <input
-                    type="text"
-                    placeholder="Contoh: Ujian Kompetensi Perawat Batch 1"
-                    value={judul}
-                    onChange={(e) => setJudul(e.target.value)}
-                    className="w-full border-2 border-gray-200 text-gray-700 placeholder-gray-400 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                    required
-                  />
+                  <input type="text" placeholder="Contoh: Ujian Kompetensi Perawat Batch 1" value={judul} onChange={(e) => setJudul(e.target.value)} className="w-full border-2 border-gray-200 text-gray-700 placeholder-gray-400 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required />
                 </div>
 
                 {/* Deskripsi */}
@@ -621,13 +614,7 @@ export default function CreateUjianPage() {
                         Waktu Selesai
                         <span className="text-red-500 ml-1">*</span>
                       </label>
-                      <input
-                        type="datetime-local"
-                        value={waktuSelesai}
-                        onChange={(e) => setWaktuSelesai(e.target.value)}
-                        className="w-full border-2 border-red-200 text-gray-700 p-2.5 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white"
-                        required
-                      />
+                      <input type="datetime-local" value={waktuSelesai} onChange={(e) => setWaktuSelesai(e.target.value)} className="w-full border-2 border-red-200 text-gray-700 p-2.5 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white" required />
                     </div>
                   </div>
                 </div>
@@ -649,7 +636,7 @@ export default function CreateUjianPage() {
                   >
                     <option value="">-- Pilih Batch Soal --</option>
                     {batchList.map((b) => (
-                      <option key={b.id} value={String(b.id)}>  {/* ✅ selalu string */}
+                      <option key={b.id} value={String(b.id)}>  {/* selalu string */}
                         {b.nama}
                       </option>
                     ))}
@@ -721,7 +708,7 @@ export default function CreateUjianPage() {
 
         </div>
       </main>
-      {/* ✅ Tambahkan di sini */}
+      {/* Tambahkan di sini */}
       {showConfirm && (
         <ConfirmModal
           message={confirmMessage}

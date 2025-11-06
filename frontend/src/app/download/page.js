@@ -23,7 +23,7 @@ export default function DownloadCenter() {
   useEffect(() => {
     async function fetchFiles() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/files`); // ✅ ganti sesuai baseURL servermu
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/files`); // ganti sesuai baseURL servermu
         const data = await res.json();
         setDocuments(data);
       } catch (err) {
@@ -54,7 +54,7 @@ export default function DownloadCenter() {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-gray-800">File Center</h2>
 
-            {/* ✅ Upload hanya untuk kepala unit & mitra bestari */}
+            {/* Upload hanya untuk kepala unit & mitra bestari */}
             {(role === "kepala unit" || role === "mitra bestari") && (
               <label className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-md cursor-pointer">
                 + Upload File
@@ -127,7 +127,7 @@ export default function DownloadCenter() {
                     Download
                   </a>
 
-                  {/* ✅ Delete hanya untuk kepala unit & mitra bestari */}
+                  {/* Delete hanya untuk kepala unit & mitra bestari */}
                   {(role === "kepala unit" || role === "mitra bestari") && (
                     <button
                       onClick={async () => {

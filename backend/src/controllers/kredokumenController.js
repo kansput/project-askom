@@ -36,12 +36,12 @@ const deleteFile = (filePath) => {
         
         if (fs.existsSync(fullPath)) {
             fs.unlinkSync(fullPath);
-            console.log("✅ File deleted:", fullPath);
+            console.log("File deleted:", fullPath);
         } else {
             console.log("⚠️ File not found:", fullPath);
         }
     } catch (error) {
-        console.error("❌ Error deleting file:", error);
+        console.error(" Error deleting file:", error);
     }
 };
 
@@ -92,15 +92,15 @@ export const uploadKredoDokumen = async (req, res) => {
 
         const newDoc = await KredoDokumen.create(data);
 
-        console.log("✅ Document saved to database:", newDoc.id);
+        console.log("Document saved to database:", newDoc.id);
 
         return res.status(201).json({
             success: true,
-            message: "✅ Dokumen Kredensial & SPKK berhasil diupload",
+            message: "Dokumen Kredensial & SPKK berhasil diupload",
             data: newDoc,
         });
     } catch (error) {
-        console.error("❌ Error uploading kredokumen:", error);
+        console.error(" Error uploading kredokumen:", error);
         return res.status(500).json({
             success: false,
             message: error.message || "Gagal upload dokumen",
@@ -115,7 +115,7 @@ export const deleteKredoDokumen = async (req, res) => {
         const userId = req.user.id;
         const userRole = req.user.role;
 
-        console.log("🗑️ Delete request received:");
+        console.log(" Delete request received:");
         console.log("Document ID:", id);
         console.log("User ID:", userId);
         console.log("User Role:", userRole);
@@ -126,7 +126,7 @@ export const deleteKredoDokumen = async (req, res) => {
         if (!doc) {
             return res.status(404).json({
                 success: false,
-                message: "❌ Dokumen tidak ditemukan",
+                message: " Dokumen tidak ditemukan",
             });
         }
 
@@ -135,7 +135,7 @@ export const deleteKredoDokumen = async (req, res) => {
         if (userRole === "perawat" && doc.userId !== userId) {
             return res.status(403).json({
                 success: false,
-                message: "❌ Anda tidak memiliki izin untuk menghapus dokumen ini",
+                message: " Anda tidak memiliki izin untuk menghapus dokumen ini",
             });
         }
 
@@ -150,14 +150,14 @@ export const deleteKredoDokumen = async (req, res) => {
         deleteFile(fileKredensialPath);
         deleteFile(fileSPKKPath);
 
-        console.log("✅ Document deleted successfully:", id);
+        console.log("Document deleted successfully:", id);
 
         return res.json({
             success: true,
-            message: "✅ Dokumen berhasil dihapus",
+            message: "Dokumen berhasil dihapus",
         });
     } catch (error) {
-        console.error("❌ Error deleting kredokumen:", error);
+        console.error(" Error deleting kredokumen:", error);
         return res.status(500).json({
             success: false,
             message: error.message || "Gagal menghapus dokumen",
@@ -205,7 +205,7 @@ export const getAllKredoDokumen = async (req, res) => {
             total: result.length,
         });
     } catch (error) {
-        console.error("❌ Error fetching all kredokumen:", error);
+        console.error(" Error fetching all kredokumen:", error);
         return res.status(500).json({
             success: false,
             message: error.message || "Gagal mengambil semua dokumen",
@@ -252,7 +252,7 @@ export const getKredoDokumenByUser = async (req, res) => {
             };
         });
 
-        console.log(`✅ Found ${result.length} documents for user ${userId}`);
+        console.log(`Found ${result.length} documents for user ${userId}`);
 
         return res.json({
             success: true,
@@ -260,7 +260,7 @@ export const getKredoDokumenByUser = async (req, res) => {
             total: result.length,
         });
     } catch (error) {
-        console.error("❌ Error fetching kredokumen by user:", error);
+        console.error(" Error fetching kredokumen by user:", error);
         return res.status(500).json({
             success: false,
             message: error.message || "Gagal mengambil dokumen per user",
@@ -288,7 +288,7 @@ export const getKredoDokumenById = async (req, res) => {
         if (!doc) {
             return res.status(404).json({
                 success: false,
-                message: `❌ Dokumen dengan id=${id} tidak ditemukan`,
+                message: ` Dokumen dengan id=${id} tidak ditemukan`,
             });
         }
 
@@ -313,7 +313,7 @@ export const getKredoDokumenById = async (req, res) => {
             data: result,
         });
     } catch (error) {
-        console.error("❌ Error fetching kredokumen by id:", error);
+        console.error(" Error fetching kredokumen by id:", error);
         return res.status(500).json({
             success: false,
             message: error.message || "Gagal mengambil dokumen berdasarkan id",

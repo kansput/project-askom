@@ -49,11 +49,11 @@ export const createStrDocument = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "✅ STR document berhasil dibuat",
+      message: " STR document berhasil dibuat",
       data: newDoc,
     });
   } catch (error) {
-    console.error("❌ Error creating STR document:", error);
+    console.error(" Error creating STR document:", error);
     return res.status(500).json({
       success: false,
       message: error.message || "Gagal membuat dokumen STR",
@@ -94,7 +94,7 @@ export const getAllStrDocuments = async (req, res) => {
       total: result.length,
     });
   } catch (error) {
-    console.error("❌ Error fetching all STR documents:", error);
+    console.error(" Error fetching all STR documents:", error);
     return res.status(500).json({
       success: false,
       message: error.message || "Gagal mengambil semua dokumen STR",
@@ -138,7 +138,7 @@ export const getStrDocumentsByUser = async (req, res) => {
       total: result.length,
     });
   } catch (error) {
-    console.error("❌ Error fetching STR documents by user:", error);
+    console.error(" Error fetching STR documents by user:", error);
     return res.status(500).json({
       success: false,
       message: error.message || "Gagal mengambil dokumen STR per user",
@@ -164,7 +164,7 @@ export const getStrDocumentById = async (req, res) => {
     if (!doc) {
       return res.status(404).json({
         success: false,
-        message: `❌ Dokumen dengan id=${id} tidak ditemukan`,
+        message: ` Dokumen dengan id=${id} tidak ditemukan`,
       });
     }
 
@@ -179,7 +179,7 @@ export const getStrDocumentById = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("❌ Error fetching STR document by id:", error);
+    console.error(" Error fetching STR document by id:", error);
     return res.status(500).json({
       success: false,
       message: error.message || "Gagal mengambil dokumen STR berdasarkan id",
@@ -196,7 +196,7 @@ export const updateStrDocument = async (req, res) => {
     if (!doc) {
       return res.status(404).json({
         success: false,
-        message: `❌ Dokumen dengan id=${id} tidak ditemukan`,
+        message: ` Dokumen dengan id=${id} tidak ditemukan`,
       });
     }
 
@@ -204,11 +204,11 @@ export const updateStrDocument = async (req, res) => {
 
     return res.json({
       success: true,
-      message: "✅ STR document berhasil diupdate",
+      message: " STR document berhasil diupdate",
       data: doc,
     });
   } catch (error) {
-    console.error("❌ Error updating STR document:", error);
+    console.error(" Error updating STR document:", error);
     return res.status(500).json({
       success: false,
       message: error.message || "Gagal mengupdate dokumen STR",
@@ -225,7 +225,7 @@ export const deleteStrDocument = async (req, res) => {
     if (!doc) {
       return res.status(404).json({
         success: false,
-        message: `❌ Dokumen dengan id=${id} tidak ditemukan`,
+        message: ` Dokumen dengan id=${id} tidak ditemukan`,
       });
     }
 
@@ -233,10 +233,10 @@ export const deleteStrDocument = async (req, res) => {
 
     return res.json({
       success: true,
-      message: "✅ STR document berhasil dihapus",
+      message: " STR document berhasil dihapus",
     });
   } catch (error) {
-    console.error("❌ Error deleting STR document:", error);
+    console.error(" Error deleting STR document:", error);
     return res.status(500).json({
       success: false,
       message: error.message || "Gagal menghapus dokumen STR",

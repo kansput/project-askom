@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { handleExportPresentasiPDF } from "@/utils/exportpresentasiPDF";
+import { toast } from "react-hot-toast";
 
 
 export default function HasilPenilaianPage() {
@@ -22,7 +23,7 @@ export default function HasilPenilaianPage() {
   useEffect(() => {
     const getUserInfo = () => {
       try {
-        if (typeof window !== "undefined") { // ✅ pastikan hanya di client
+        if (typeof window !== "undefined") { // pastikan hanya di client
           const token = localStorage.getItem("token");
           if (token) {
             const payload = JSON.parse(atob(token.split('.')[1]));
@@ -98,14 +99,14 @@ export default function HasilPenilaianPage() {
       const result = await res.json();
 
       if (result.success) {
-        alert("Data penilaian berhasil dihapus");
+        toast.success("Data penilaian berhasil dihapus");
         fetchPenilaian(); // Refresh data
       } else {
-        alert("Gagal menghapus data: " + result.message);
+        toast.error("Gagal menghapus data: " + result.message);
       }
     } catch (error) {
       console.error("Error deleting penilaian:", error);
-      alert("Terjadi kesalahan saat menghapus data");
+      toast.error("Terjadi kesalahan saat menghapus data");
     } finally {
       setDeletingId(null);
     }

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
+import { toast } from "react-hot-toast";
 
 // Placeholder components to resolve import errors
 const Navbar = ({ title }) => (
@@ -62,7 +63,7 @@ export default function UjianDetailPage() {
       return true;
     } catch (err) {
       console.error("Fullscreen error:", err);
-      alert("⚠️ Gagal masuk mode fullscreen. Pastikan Anda mengizinkan di browser.");
+      toast.error(" Gagal masuk mode fullscreen. Pastikan Anda mengizinkan di browser.");
       return false;
     }
   };
@@ -171,9 +172,9 @@ export default function UjianDetailPage() {
       if (!isNowFullscreen && !isSubmitting && examStarted) {
         setExitAttempts((prev) => {
           const newAttempts = prev + 1;
-          // Alert sederhana untuk "nendang" pertama kali
+          
           if (newAttempts === 1) {
-            alert("⚠️ Jangan keluar dari fullscreen! Ujian sedang berlangsung. Kembali sekarang.");
+            toast.error("⚠️ Jangan keluar dari fullscreen! Ujian sedang berlangsung. Kembali sekarang.");
           }
           return newAttempts;
         });
@@ -183,7 +184,7 @@ export default function UjianDetailPage() {
         if (exitAttempts >= 3) { // Ubah ke 2 biar lebih ketat, atau sesuaikan
           setTimeout(() => {
             if (!isFullscreen) {
-              alert(" Terlalu banyak percobaan keluar. Ujian disubmit otomatis!");
+              toast.error(" Terlalu banyak percobaan keluar. Ujian disubmit otomatis!");
               handleSubmit(true);
             }
           }, 3000);
@@ -301,12 +302,12 @@ export default function UjianDetailPage() {
             setTimeRemaining(data.data.durasi * 60);
           }
         } else {
-          alert(" Ujian tidak ditemukan atau akses ditolak.");
+          toast.error(" Ujian tidak ditemukan atau akses ditolak.");
           window.location.href = "/dashboard";
         }
       } catch (err) {
         console.error(" Gagal ambil detail ujian:", err);
-        alert("Terjadi kesalahan koneksi. Silakan coba lagi.");
+        toast.error("Terjadi kesalahan koneksi. Silakan coba lagi.");
       } finally {
         setLoading(false);
       }
@@ -381,14 +382,14 @@ export default function UjianDetailPage() {
       });
       const data = await res.json();
       if (data.success) {
-        alert(autoSubmit ? "⏰ Waktu habis! Ujian otomatis disubmit." : "✅ Ujian berhasil disubmit!");
+        toast.success(autoSubmit ? " Waktu habis! Ujian otomatis disubmit." : " Ujian berhasil disubmit!");
         window.location.href = "/dashboard";
       } else {
-        alert(" Gagal submit ujian: " + data.message);
+        toast.error(" Gagal submit ujian: " + data.message);
       }
     } catch (err) {
       console.error(" Error submit ujian:", err);
-      alert("Terjadi kesalahan saat submit ujian.");
+      toast.error("Terjadi kesalahan saat submit ujian.");
     } finally {
       setIsSubmitting(false);
     }

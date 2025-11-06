@@ -5,9 +5,11 @@ import PropTypes from "prop-types";
 import EditPerawatDialog from "@/components/EditPerawatDialog";
 import AddPerawatDialog from "@/components/AddPerawatDialog";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Search, RotateCcw, UserPlus, Edit, Trash2, Users, SlidersHorizontal, User, UserCircle, Mail, Calendar, Shield, Settings, Building, MapPin, TrendingUp } from "lucide-react";
+
 
 /* =================================================================
    TABEL PERAWAT
@@ -36,16 +38,61 @@ const NurseTable = ({ title, perawat, headerColor, onEdit, onDelete }) => {
         <table className="min-w-full table-fixed divide-y divide-gray-200">
           <thead className={headerColor}>
             <tr>
-              <th className="w-16 px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">No</th>
-              <th className="w-24 px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">NPK</th>
-              <th className="w-48 px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nama</th>
-              <th className="w-64 px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Email</th>
-              <th className="w-40 px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Unit</th>
-              <th className="w-40 px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Area Klinis</th>
-              <th className="w-40 px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Jenjang Karir</th>
-              <th className="w-32 px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Role</th>
-              <th className="w-40 px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Tanggal Lahir</th>
-              <th className="w-40 px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Aksi</th>
+              <th className="w-16 px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">#</th>
+              <th className="w-24 px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                <div className="flex items-center gap-1">
+                  <User className="w-3 h-3" />
+                  NPK
+                </div>
+              </th>
+              <th className="w-48 px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                <div className="flex items-center gap-1">
+                  <UserCircle className="w-3 h-3" />
+                  Nama
+                </div>
+              </th>
+              <th className="w-64 px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                <div className="flex items-center gap-1">
+                  <Mail className="w-3 h-3" />
+                  Email
+                </div>
+              </th>
+              <th className="w-40 px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                <div className="flex items-center gap-1">
+                  <Building className="w-3 h-3" />
+                  Unit
+                </div>
+              </th>
+              <th className="w-40 px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                <div className="flex items-center gap-1">
+                  <MapPin className="w-3 h-3" />
+                  Area Klinis
+                </div>
+              </th>
+              <th className="w-40 px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                <div className="flex items-center gap-1">
+                  <TrendingUp className="w-3 h-3" />
+                  Jenjang Karir
+                </div>
+              </th>
+              <th className="w-32 px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                <div className="flex items-center gap-1">
+                  <Shield className="w-3 h-3" />
+                  Role
+                </div>
+              </th>
+              <th className="w-40 px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                <div className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3" />
+                  Tgl Lahir
+                </div>
+              </th>
+              <th className="w-40 px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                <div className="flex items-center gap-1">
+                  <Settings className="w-3 h-3" />
+                  Aksi
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -84,26 +131,20 @@ const NurseTable = ({ title, perawat, headerColor, onEdit, onDelete }) => {
                   }
                 </td>
                 <td className="px-4 py-4 text-sm">
-                  <div className="flex gap-2"> {/* Tambah div wrapper dengan flex */}
+                  <div className="flex gap-2">
                     <button
                       onClick={() => onEdit(p)}
                       className="group flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md shadow-sm hover:bg-blue-700 hover:shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
                       title="Edit data"
                     >
-                      <svg className="w-3.5 h-3.5 -ml-0.5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                      Edit
+                      <Edit className="w-3.5 h-3.5 -ml-0.5 transition-transform group-hover:scale-110" />
                     </button>
                     <button
                       onClick={() => onDelete(p)}
                       className="group flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-md shadow-sm hover:bg-red-700 hover:shadow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
                       title="Hapus data"
                     >
-                      <svg className="w-3.5 h-3.5 -ml-0.5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                      Hapus
+                      <Trash2 className="w-3.5 h-3.5 -ml-0.5 transition-transform group-hover:scale-110" />
                     </button>
                   </div>
                 </td>
@@ -170,14 +211,16 @@ const FilterSection = ({ filters, setFilters, allPerawat, filteredCount }) => {
     <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-black flex items-center gap-2">
-          <span>🔍</span> Filter Perawat
+          <SlidersHorizontal className="w-5 h-5" />
+          Filter Perawat
         </h3>
         {hasActiveFilters && (
           <button
             onClick={handleReset}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg text-sm font-medium transition-colors duration-200"
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center gap-2"
           >
-            🔄 Reset Filter
+            <RotateCcw className="w-4 h-4" />
+            Reset Filter
           </button>
         )}
       </div>
@@ -185,7 +228,10 @@ const FilterSection = ({ filters, setFilters, allPerawat, filteredCount }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Search Bar */}
         <div>
-          <label className="block text-sm font-medium text-black mb-2">Cari Nama/NPK/Email</label>
+          <label className="flex items-center gap-2 text-sm font-medium text-black mb-2">
+            <Search className="w-4 h-4" />
+            Cari Nama / NPK / Email
+          </label>
           <input
             type="text"
             placeholder="Ketik untuk mencari..."
@@ -197,7 +243,10 @@ const FilterSection = ({ filters, setFilters, allPerawat, filteredCount }) => {
 
         {/* Unit */}
         <div>
-          <label className="block text-sm font-medium text-black mb-2">Unit</label>
+          <label className="flex items-center gap-2 text-sm font-medium text-black mb-2">
+            <Building className="w-4 h-4" />
+            Unit
+          </label>
           <select
             value={filters.unit}
             onChange={(e) => setFilters({ ...filters, unit: e.target.value })}
@@ -212,7 +261,10 @@ const FilterSection = ({ filters, setFilters, allPerawat, filteredCount }) => {
 
         {/* Jenjang Karir */}
         <div>
-          <label className="block text-sm font-medium text-black mb-2">Jenjang Karir</label>
+          <label className="flex items-center gap-2 text-sm font-medium text-black mb-2">
+            <TrendingUp className="w-4 h-4" />
+            Jenjang Karir
+          </label>
           <select
             value={filters.jenjangKarir}
             onChange={(e) => setFilters({ ...filters, jenjangKarir: e.target.value })}
@@ -227,7 +279,10 @@ const FilterSection = ({ filters, setFilters, allPerawat, filteredCount }) => {
 
         {/* Role */}
         <div>
-          <label className="block text-sm font-medium text-black mb-2">Role</label>
+          <label className="flex items-center gap-2 text-sm font-medium text-black mb-2">
+            <Shield className="w-4 h-4" />
+            Role
+          </label>
           <select
             value={filters.role}
             onChange={(e) => setFilters({ ...filters, role: e.target.value })}
@@ -242,7 +297,10 @@ const FilterSection = ({ filters, setFilters, allPerawat, filteredCount }) => {
 
         {/* Area Klinis */}
         <div>
-          <label className="block text-sm font-medium text-black mb-2">Area Klinis</label>
+          <label className="flex items-center gap-2 text-sm font-medium text-black mb-2">
+            <MapPin className="w-4 h-4" />
+            Area Klinis
+          </label>
           <select
             value={filters.areaKlinis}
             onChange={(e) => setFilters({ ...filters, areaKlinis: e.target.value })}
@@ -421,6 +479,18 @@ export default function DaftarPerawatPage() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isKepalaUnit, setIsKepalaUnit] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const userData = JSON.parse(localStorage.getItem("user"));
+        setIsKepalaUnit(userData?.role === "kepala unit");
+      } catch {
+        setIsKepalaUnit(false);
+      }
+    }
+  }, []);
 
   const fetchPerawat = async () => {
     try {
@@ -461,7 +531,7 @@ export default function DaftarPerawatPage() {
         throw new Error(result.message || "Failed to fetch data");
       }
     } catch (err) {
-      console.error("❌ Error fetch:", err);
+      console.error(" Error fetch:", err);
       setError(err.message || "An unexpected error occurred");
     } finally {
       setLoading(false);
@@ -502,14 +572,14 @@ export default function DaftarPerawatPage() {
       const result = await res.json();
 
       if (result.success) {
-        toast.success("Data perawat berhasil diperbarui ✅");
+        toast.success("Data perawat berhasil diperbarui ");
         await fetchPerawat();
       } else {
         throw new Error(result.message || "Gagal memperbarui data");
       }
     } catch (err) {
       console.error("Error PATCH:", err);
-      toast.error(err.message || "Gagal memperbarui data ❌");
+      toast.error(err.message || "Gagal memperbarui data ");
     }
   };
 
@@ -517,7 +587,7 @@ export default function DaftarPerawatPage() {
 
   const handleDelete = async (perawatId) => {
     try {
-      console.log("🔄 Starting DELETE process for perawat ID:", perawatId);
+      console.log(" Starting DELETE process for perawat ID:", perawatId);
 
       const token = localStorage.getItem("token");
       if (!token) {
@@ -525,8 +595,8 @@ export default function DaftarPerawatPage() {
         return;
       }
 
-      console.log("📤 Sending DELETE request to:", `${process.env.NEXT_PUBLIC_API_URL}/api/perawat/${perawatId}`);
-      console.log("🔑 Token exists:", !!token);
+      console.log(" Sending DELETE request to:", `${process.env.NEXT_PUBLIC_API_URL}/api/perawat/${perawatId}`);
+      console.log(" Token exists:", !!token);
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/perawat/${perawatId}`, {
         method: "DELETE",
@@ -536,42 +606,42 @@ export default function DaftarPerawatPage() {
         },
       });
 
-      console.log("📥 Response status:", res.status);
-      console.log("📥 Response ok:", res.ok);
+      console.log(" Response status:", res.status);
+      console.log(" Response ok:", res.ok);
 
       // Cek status response
       if (!res.ok) {
         const errorText = await res.text();
-        console.error("❌ Server error response:", errorText);
-        console.error("❌ Response headers:", Object.fromEntries(res.headers.entries()));
+        console.error(" Server error response:", errorText);
+        console.error(" Response headers:", Object.fromEntries(res.headers.entries()));
 
         let errorMessage = "Gagal menghapus perawat";
         try {
           const errorResult = JSON.parse(errorText);
           errorMessage = errorResult.message || errorMessage;
-          console.error("❌ Parsed error result:", errorResult);
+          console.error(" Parsed error result:", errorResult);
         } catch (e) {
           // Jika response bukan JSON, gunakan status text
           errorMessage = `Error ${res.status}: ${res.statusText}`;
-          console.error("❌ Response is not JSON:", errorText);
+          console.error(" Response is not JSON:", errorText);
         }
 
         throw new Error(errorMessage);
       }
 
       const result = await res.json();
-      console.log("✅ Delete success result:", result);
+      console.log(" Delete success result:", result);
 
       if (result.success) {
-        toast.success("Perawat berhasil dihapus ✅");
+        ("Perawat berhasil dihapus ");
         await fetchPerawat();
       } else {
         throw new Error(result.message || "Gagal menghapus perawat");
       }
     } catch (err) {
-      console.error("💥 Error DELETE:", err);
-      console.error("💥 Error stack:", err.stack);
-      toast.error(err.message || "Gagal menghapus perawat ❌");
+      console.error(" Error DELETE:", err);
+      console.error(" Error stack:", err.stack);
+      toast.error(err.message || "Gagal menghapus perawat ");
     }
   };
 
@@ -585,7 +655,7 @@ export default function DaftarPerawatPage() {
         return;
       }
 
-      console.log("📤 Sending POST request to add perawat");
+      console.log(" Sending POST request to add perawat");
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/perawat`, {
         method: "POST",
@@ -613,14 +683,14 @@ export default function DaftarPerawatPage() {
       const result = await res.json();
 
       if (result.success) {
-        toast.success("Perawat baru berhasil ditambahkan ✅");
+        toast.success("Perawat baru berhasil ditambahkan ");
         await fetchPerawat();
       } else {
         throw new Error(result.message || "Gagal menambahkan perawat");
       }
     } catch (err) {
       console.error("Error POST:", err);
-      toast.error(err.message || "Gagal menambahkan perawat ❌");
+      toast.error(err.message || "Gagal menambahkan perawat ");
     }
   };
   useEffect(() => {
@@ -631,27 +701,50 @@ export default function DaftarPerawatPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar title="Daftar Perawat" />
 
-      {/* Header + Tombol Tambah Perawat (khusus kepala unit) */}
-      <div className="flex justify-between items-center px-6 mt-6">
-        <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <span className="text-blue-600">📋</span> Daftar Perawat
-        </h2>
+      {/* Header + Tombol Tambah Perawat (Profesional & Keren) */}
+      <div className="bg-gradient-to-r from-blue-900 to-blue-700 mx-6 mt-6 rounded-xl shadow-2xl p-5 border border-blue-800/40 overflow-hidden">
+        <div className="flex justify-between items-center">
+          {/* Kiri: Icon + Judul */}
+          <div className="flex items-center gap-3">
+            <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-md border border-white/20 shadow-inner">
+              <Users className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-white tracking-tight">
+                Daftar Perawat
+              </h2>
+              <p className="text-blue-100 text-xs font-medium">
+                Kelola data staf medis
+              </p>
+            </div>
+          </div>
 
-        {typeof window !== "undefined" && (() => {
-          try {
-            const userData = JSON.parse(localStorage.getItem("user"));
-            return userData?.role === "kepala unit";
-          } catch {
-            return false;
-          }
-        })() && (
+          {/* Kanan: Tombol Tambah (Keren Banget) */}
+          {isKepalaUnit && (
             <button
               onClick={() => setShowAddDialog(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-all"
+              className="
+          relative px-5 py-2.5 
+          bg-gradient-to-r from-cyan-500 to-blue-600 
+          text-white font-semibold text-sm 
+          rounded-lg 
+          shadow-lg hover:shadow-cyan-500/30 
+          border border-cyan-400/50 
+          overflow-hidden 
+          group 
+          transition-all duration-300 
+          hover:scale-105 
+          flex items-center gap-2
+        "
             >
-              + Tambah Perawat
+              {/* Efek Glow Background */}
+              <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
+
+              <UserPlus className="w-4.5 h-4.5 transition-transform group-hover:rotate-90 group-hover:scale-110 duration-300" />
+              <span className="relative z-10">Tambah Perawat</span>
             </button>
           )}
+        </div>
       </div>
 
       {/* List Section */}

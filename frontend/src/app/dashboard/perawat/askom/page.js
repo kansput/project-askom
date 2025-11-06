@@ -1,8 +1,10 @@
 "use client";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { toast } from "react-hot-toast";
 
 export default function AskomPage() {
   const router = useRouter();
@@ -30,7 +32,11 @@ export default function AskomPage() {
   }, [exitAttempts]);
 
   const examContainerRef = useRef(null);
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : "";
+
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : "";
+  console.log("DEBUG token:", token);
+
 
   // Fetch ujian aktif + soal
   useEffect(() => {
@@ -59,10 +65,28 @@ export default function AskomPage() {
             if (dataDetail.success) {
               setUjian(dataDetail.data);
               setSoalList(dataDetail.data.batchSoal?.soals || []);
+
               if (dataDetail.data.durasi) {
-                setTimeRemaining(dataDetail.data.durasi * 60);
+                const durasiDetik = dataDetail.data.durasi * 60;
+                const waktuGlobalSelesai = new Date(dataDetail.data.waktuSelesai);
+                const waktuMulaiSekarang = new Date();
+
+                // hitung waktu personal + global
+                const waktuPribadiSelesai = new Date(waktuMulaiSekarang.getTime() + durasiDetik * 1000);
+                const waktuSelesaiFinal =
+                  waktuPribadiSelesai < waktuGlobalSelesai
+                    ? waktuPribadiSelesai
+                    : waktuGlobalSelesai;
+
+                const sisaDetik = Math.max(
+                  0,
+                  Math.floor((waktuSelesaiFinal - waktuMulaiSekarang) / 1000)
+                );
+
+                setTimeRemaining(sisaDetik);
               }
-            } else {
+            }
+            else {
               setError("Ujian aktif ditemukan tapi detail gagal dimuat.");
             }
           } else {
@@ -94,52 +118,113 @@ export default function AskomPage() {
       return true;
     } catch (err) {
       console.error("Fullscreen error:", err);
-      alert(" Gagal masuk fullscreen. Izinkan di browser.");
+      toast.error(" Gagal masuk fullscreen. Izinkan di browser.");
       return false;
     }
   }, []);
 
   const exitFullscreen = useCallback(() => {
-    if (document.exitFullscreen) document.exitFullscreen();
-    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-    else if (document.msExitFullscreen) document.msExitFullscreen();
+    try {
+      if (
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.msFullscreenElement
+      ) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      }
+    } catch (err) {
+      console.warn(" Gagal keluar dari fullscreen (sudah nonaktif):", err.message);
+    }
   }, []);
+
+
+
 
   const handleStartExam = async () => {
     const success = await enterFullscreen();
-    if (success) setExamStarted(true);
+    if (!success) return;
+
+    if (!ujian?.id) {
+      toast.error("ID ujian tidak ditemukan.");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/ujian/${ujian.id}/start`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (!data.success) {
+        toast.error("Gagal memulai ujian: " + data.message);
+        return;
+      }
+
+      setExamStarted(true);
+      console.log(" Ujian dimulai:", data.data);
+    } catch (err) {
+      console.error(" Gagal memulai ujian:", err);
+      toast.error("Terjadi kesalahan saat memulai ujian.");
+    }
   };
+
 
   const handleReEnterFromWarning = () => enterFullscreen();
 
   const handleJawab = (soalId, pilihan) => setJawaban((prev) => ({ ...prev, [soalId]: pilihan }));
 
-  const handleSubmit = useCallback(async (autoSubmit = false) => {
-    setIsSubmitting(true);
-    setShowConfirmModal(false);
-    setShowExitWarning(false);
-    exitFullscreen();
+  const handleSubmit = useCallback(
+    async (isAuto = false) => {
+      exitFullscreen();
+      setLoading(true);
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ujian/${ujian.id}/submit`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            jawaban,
+            exitAttempts,
+            tabSwitchCount,
+          }),
+        });
+        const data = await res.json();
 
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ujian/${ujian?.id}/submit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ jawaban, exitAttempts, tabSwitchCount }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert(autoSubmit ? "⏰ Waktu habis!" : "✅ Ujian disubmit!");
-        router.push("/dashboard");
-      } else {
-        alert("❌ Gagal submit: " + data.message);
+        if (!data.success) {
+          toast.error(" Gagal submit: " + data.message);
+          return;
+        }
+
+        toast.success(" Ujian berhasil dikumpulkan!");
+
+        //  Redirect ke dashboard setelah submit sukses
+        router.push("/dashboard/perawat");
+
+      } catch (err) {
+        console.error(" Gagal submit:", err);
+        toast.error("Terjadi kesalahan saat mengirim hasil ujian.");
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Submit error:", err);
-      alert("Kesalahan submit ujian.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [token, ujian?.id, jawaban, exitAttempts, tabSwitchCount, router, exitFullscreen]);
+    },
+    [ujian, jawaban, exitAttempts, tabSwitchCount, token, exitFullscreen, router]
+  );
 
   // Fullscreen change handler
   useEffect(() => {
@@ -152,7 +237,7 @@ export default function AskomPage() {
       if (!isNowFullscreen && !isSubmitting && examStarted) {
         setExitAttempts((prev) => {
           const newAttempts = prev + 1;
-          if (newAttempts === 1) alert("Jangan keluar fullscreen! Kembali sekarang.");
+          if (newAttempts === 1) toast.error("Jangan keluar fullscreen! Kembali sekarang.");
           return newAttempts;
         });
         setShowExitWarning(true);
@@ -161,7 +246,7 @@ export default function AskomPage() {
         if (exitAttemptsRef.current >= 2) {
           setTimeout(() => {
             if (!isNowFullscreen) {
-              alert("Terlalu banyak percobaan. Ujian disubmit otomatis!");
+              toast.error("Terlalu banyak percobaan. Ujian disubmit otomatis!");
               handleSubmit(true);
             }
           }, 3000);
@@ -532,28 +617,48 @@ export default function AskomPage() {
                   {jawaban[currentSoalData.id] && <span className="px-3 py-1 bg-green-600 text-white rounded-full text-sm">✓ Terjawab</span>}
                 </div>
                 <div className="prose prose-invert max-w-none mb-6 text-gray-300" dangerouslySetInnerHTML={{ __html: currentSoalData.pertanyaan }} />
+                {currentSoalData.gambar && (
+                  <div className="my-4">
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_API_URL}${currentSoalData.gambar}`}
+                      alt="Gambar soal"
+                      width={600}        // sesuaikan ukuran realistis
+                      height={400}       // biar aspect ratio stabil
+                      className="rounded-lg border shadow-sm object-contain"
+                      unoptimized        // tambahkan ini kalau gambar dari luar domain API
+                    />
+                  </div>
+                )}
+
+
                 <div className="space-y-4">
-                  {["A", "B", "C", "D", "E"].map((pilihan) => {
-                    const optionKey = `pilihan_${pilihan.toLowerCase()}`;
-                    const optionText = currentSoalData[optionKey];
-                    if (!optionText) return null;
-                    const isSelected = jawaban[currentSoalData.id] === pilihan;
-                    return (
-                      <button
-                        key={pilihan}
-                        onClick={() => handleJawab(currentSoalData.id, pilihan)}
-                        className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 flex items-start gap-4 ${isSelected ? "bg-blue-600 border-blue-400 text-white shadow-lg" : "bg-gray-700 border-gray-600 hover:bg-gray-600 hover:border-gray-500"
-                          }`}
-                      >
-                        <div className={`w-6 h-6 rounded-full flex-shrink-0 mt-1 flex items-center justify-center font-bold text-sm ${isSelected ? "bg-white text-blue-600" : "bg-gray-600 text-white"
-                          }`}>
-                          {pilihan}
-                        </div>
-                        <div className="flex-1" dangerouslySetInnerHTML={{ __html: optionText }} />
-                      </button>
-                    );
-                  })}
+                  {Array.isArray(currentSoalData.opsi) && currentSoalData.opsi.length > 0 ? (
+                    currentSoalData.opsi.map((opsi) => {
+                      const isSelected = jawaban[currentSoalData.id] === opsi.kode;
+                      return (
+                        <button
+                          key={opsi.kode}
+                          onClick={() => handleJawab(currentSoalData.id, opsi.kode)}
+                          className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 flex items-start gap-4 ${isSelected
+                            ? "bg-blue-600 border-blue-400 text-white shadow-lg"
+                            : "bg-gray-700 border-gray-600 hover:bg-gray-600 hover:border-gray-500"
+                            }`}
+                        >
+                          <div
+                            className={`w-6 h-6 rounded-full flex-shrink-0 mt-1 flex items-center justify-center font-bold text-sm ${isSelected ? "bg-white text-blue-600" : "bg-gray-600 text-white"
+                              }`}
+                          >
+                            {opsi.kode}
+                          </div>
+                          <div className="flex-1" dangerouslySetInnerHTML={{ __html: opsi.text }} />
+                        </button>
+                      );
+                    })
+                  ) : (
+                    <p className="text-gray-400 text-sm italic">Opsi tidak tersedia.</p>
+                  )}
                 </div>
+
               </div>
 
               {/* Navigation */}

@@ -7,20 +7,11 @@ const Ujian = sequelize.define("Ujian", {
   deskripsi: { type: DataTypes.TEXT, allowNull: true },
   waktuMulai: { type: DataTypes.DATE, allowNull: false },
   waktuSelesai: { type: DataTypes.DATE, allowNull: false },
-  status: {
-    type: DataTypes.ENUM("draft", "active", "closed"),
-    allowNull: false,
-    defaultValue: "draft",
-  },
-  createdBy: { type: DataTypes.INTEGER, allowNull: false },
-
-  // 🔥 foreign key ke batch soal
-  batchSoalId: { 
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-
-}, {
+  durasi: { type: DataTypes.INTEGER, allowNull: true }, // menit, optional
+  status: { type: DataTypes.ENUM("draft", "active", "closed"), defaultValue: "draft", allowNull: false, },
+  batchSoalId: { type: DataTypes.INTEGER, allowNull: false, references: { model: "BatchSoal", key: "id" }, onDelete: "CASCADE", },
+  createdBy: { type: DataTypes.INTEGER, allowNull: false, references: { model: "Users", key: "id" }, onDelete: "CASCADE", },}, 
+  {
   tableName: "Ujian",
   timestamps: true,
 });

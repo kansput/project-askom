@@ -64,7 +64,7 @@ export default function StrRiwayatPage() {
             }
 
             const result = await res.json();
-            console.log("✅ Response data:", result);
+            console.log(" Response data:", result);
 
             if (result.success) {
                 setDocs(result.data || []);

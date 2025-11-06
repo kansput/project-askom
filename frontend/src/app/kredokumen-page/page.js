@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { FileText, Download, Calendar, Search, ChevronDown, ChevronUp, Filter, User, AlertCircle, ShieldCheck, Award, Trash2, Check, X } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 export default function KredoRiwayatPage() {
     const router = useRouter();
@@ -16,7 +16,7 @@ export default function KredoRiwayatPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
-    // ✅ Function untuk handle sorting
+    //Function untuk handle sorting
     const handleSort = (key) => {
         setSortConfig(current => ({
             key,
@@ -24,7 +24,7 @@ export default function KredoRiwayatPage() {
         }));
     };
 
-    // ✅ Function untuk fetch documents
+    //Function untuk fetch documents
     const fetchDocuments = useCallback(async () => {
         try {
             setLoading(true);
@@ -68,7 +68,7 @@ export default function KredoRiwayatPage() {
             }
 
             const result = await res.json();
-            console.log("✅ Response data:", result);
+            console.log(" Response data:", result);
 
             if (result.success) {
                 setDocs(result.data || []);
@@ -77,7 +77,7 @@ export default function KredoRiwayatPage() {
                 throw new Error(result.message || "Gagal memuat dokumen kredensial");
             }
         } catch (err) {
-            console.error("❌ Error fetch kredokumen:", err);
+            console.error(" Error fetch kredokumen:", err);
             setError(err.message || "Terjadi kesalahan saat mengambil data");
 
             if (err.message.includes("401") || err.message.includes("403") || err.message.includes("Token")) {
@@ -151,7 +151,7 @@ export default function KredoRiwayatPage() {
         try {
             //  PERBAIKAN: Gunakan full URL dengan environment variable
             const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/kredokumen/${documentId}`;
-            console.log("🗑️ Deleting document:", apiUrl);
+            console.log("Deleting document:", apiUrl);
 
             const token = localStorage.getItem("token");
             const response = await fetch(apiUrl, {
@@ -162,9 +162,9 @@ export default function KredoRiwayatPage() {
                 }
             });
 
-            console.log("🗑️ Delete response status:", response.status);
+            console.log("Delete response status:", response.status);
 
-            // ✅ Handle non-JSON responses
+           
             const contentType = response.headers.get("content-type");
             let result;
 
@@ -172,20 +172,20 @@ export default function KredoRiwayatPage() {
                 result = await response.json();
             } else {
                 const text = await response.text();
-                console.error("❌ Non-JSON response:", text.substring(0, 200));
+                console.error(" Non-JSON response:", text.substring(0, 200));
                 throw new Error(`Server error: ${response.status} ${response.statusText}`);
             }
 
             if (result.success) {
-                toast.success('✅ Dokumen berhasil dihapus', { id: deleteToast });
-                // ✅ Refresh data setelah delete berhasil
+                toast.success(' Dokumen berhasil dihapus', { id: deleteToast });
+                //Refresh data setelah delete berhasil
                 fetchDocuments();
             } else {
-                toast.error(`❌ Gagal: ${result.message}`, { id: deleteToast });
+                toast.error(` Gagal: ${result.message}`, { id: deleteToast });
             }
         } catch (error) {
-            console.error('❌ Error deleting document:', error);
-            toast.error('❌ Terjadi kesalahan sistem: ' + error.message, { id: deleteToast });
+            console.error(' Error deleting document:', error);
+            toast.error(' Terjadi kesalahan sistem: ' + error.message, { id: deleteToast });
         }
     };
 

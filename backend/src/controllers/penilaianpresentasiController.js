@@ -109,7 +109,7 @@ export const createOrUpdatePenilaian = async (req, res) => {
                 updateData.status = "penguji1_selesai";
             }
             if (nilai_penguji2 !== undefined && isUserPenguji2) {
-                updateData.status = "penguji2_selesai"; // ✅ PERBAIKAN
+                updateData.status = "penguji2_selesai"; 
             }
 
             if (status) updateData.status = status;
@@ -148,7 +148,7 @@ export const createOrUpdatePenilaian = async (req, res) => {
             data: updated,
         });
     } catch (err) {
-        console.error("❌ Error createOrUpdatePenilaian:", err);
+        console.error(" Error createOrUpdatePenilaian:", err);
         res.status(500).json({
             success: false,
             message: "Internal server error",
@@ -184,7 +184,7 @@ export const getPenilaian = async (req, res) => {
 
         res.json({ success: true, data: penilaian });
     } catch (err) {
-        console.error("❌ Error getPenilaian:", err);
+        console.error(" Error getPenilaian:", err);
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
@@ -218,7 +218,7 @@ export const finalizePenilaian = async (req, res) => {
 
         res.json({ success: true, message: "Penilaian berhasil difinalisasi", data });
     } catch (err) {
-        console.error("❌ Error finalizePenilaian:", err);
+        console.error(" Error finalizePenilaian:", err);
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
@@ -240,7 +240,7 @@ export const getPenilaianByPerawat = async (req, res) => {
         });
         res.json({ success: true, data: list });
     } catch (err) {
-        console.error("❌ Error getPenilaianByPerawat:", err);
+        console.error(" Error getPenilaianByPerawat:", err);
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
@@ -260,7 +260,7 @@ export const getAllPenilaian = async (req, res) => {
         });
         res.json({ success: true, data: list });
     } catch (err) {
-        console.error("❌ Error getAllPenilaian:", err);
+        console.error(" Error getAllPenilaian:", err);
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
@@ -280,7 +280,7 @@ export const deletePenilaian = async (req, res) => {
         await data.destroy();
         res.json({ success: true, message: "Data berhasil dihapus" });
     } catch (err) {
-        console.error("❌ Error deletePenilaian:", err);
+        console.error(" Error deletePenilaian:", err);
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };

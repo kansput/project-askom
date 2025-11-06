@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { logoutUser } from "@/utils/auth";
+import { Home, User, LogOut } from "lucide-react";
 
 export default function Navbar({ title }) {
   const router = useRouter();
@@ -62,20 +63,23 @@ export default function Navbar({ title }) {
           <div className="hidden md:flex items-center space-x-4">
             <button
               onClick={handleHome}
-              className="px-4 py-2 text-sm font-medium text-white hover:text-blue-100 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white hover:text-blue-100 transition-colors flex items-center gap-2"
             >
+              <Home className="w-4 h-4" />
               Home
             </button>
             <button
               onClick={() => router.push("/profile")}
-              className="px-4 py-2 text-sm font-medium text-white hover:text-blue-100 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white hover:text-blue-100 transition-colors flex items-center gap-2"
             >
+              <User className="w-4 h-4" />
               Profile
             </button>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 text-sm font-medium bg-red-700 hover:bg-red-800 rounded-md transition-colors"
+              className="px-4 py-2 text-sm font-medium bg-red-700 hover:bg-red-800 rounded-md transition-colors flex items-center gap-2"
             >
+              <LogOut className="w-4 h-4" />
               Log Out
             </button>
           </div>
@@ -94,9 +98,8 @@ export default function Navbar({ title }) {
 
       {/* Mobile Menu with slide animation */}
       <div
-        className={`md:hidden bg-blue-800 overflow-hidden transition-all duration-500 ease-in-out ${
-          isOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
-        }`}
+        className={`md:hidden bg-blue-800 overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? "max-h-60 opacity-100" : "max-h-0 opacity-0"
+          }`}
       >
         <div className="px-4 pt-2 pb-4 space-y-2">
           <button

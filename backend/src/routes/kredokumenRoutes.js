@@ -20,15 +20,15 @@ import fs from "fs";
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const userId = req.user.id;
-    // ✅ PERBAIKAN: Sesuaikan dengan struktur folder backend/src/uploads
+    //  PERBAIKAN: Sesuaikan dengan struktur folder backend/src/uploads
     const uploadPath = path.join(process.cwd(), "src", "uploads", "kredokumen", userId.toString());
     
-    console.log("📁 Creating upload directory:", uploadPath);
+    console.log(" Creating upload directory:", uploadPath);
     
     // Buat folder jika belum ada
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
-      console.log("✅ Upload directory created");
+      console.log(" Upload directory created");
     }
     
     cb(null, uploadPath);
@@ -83,7 +83,7 @@ const handleMulterError = (err, req, res, next) => {
   next();
 };
 
-// ✅ Middleware khusus untuk handle FormData dengan multer
+//  Middleware khusus untuk handle FormData dengan multer
 const handleFormData = (req, res, next) => {
   console.log("🔍 Processing FormData...");
   console.log("📝 Headers:", req.headers);
@@ -97,14 +97,14 @@ const router = express.Router();
 router.post(
   "/upload",
   verifyToken,
-  // ✅ URUTAN YANG BENAR: Multer dulu, baru validasi
+  //  URUTAN YANG BENAR: Multer dulu, baru validasi
   upload.fields([
     { name: "fileKredensial", maxCount: 1 },
     { name: "fileSPKK", maxCount: 1 },
   ]),
   handleMulterError,
   handleFormData, // Debug middleware
-  validateKredoUpload, // ✅ Sekarang req.body sudah terisi
+  validateKredoUpload, //  Sekarang req.body sudah terisi
   uploadKredoDokumen
 );
 

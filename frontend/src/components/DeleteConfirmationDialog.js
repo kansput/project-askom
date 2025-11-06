@@ -10,7 +10,7 @@ export default function DeleteConfirmationDialog({ perawat, onClose, onConfirm }
     e.preventDefault();
 
     if (inputNpk !== perawat.npk) {
-      alert("NPK tidak sesuai. Ketik ulang NPK perawat yang akan dihapus.");
+      toast.error("NPK tidak sesuai. Ketik ulang NPK perawat yang akan dihapus.");
       return;
     }
 

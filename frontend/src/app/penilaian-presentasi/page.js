@@ -4,6 +4,7 @@ import Select from "react-select";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import StatusActions from "@/components/StatusActions";
+import { toast } from "react-hot-toast";
 
 export default function PenilaianPage() {
   // Data rubrik penilaian
@@ -84,7 +85,7 @@ export default function PenilaianPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // ✅ STATE BARU YANG MENGGANTIKAN YANG LAMA:
+  //  STATE BARU YANG MENGGANTIKAN YANG LAMA:
   const [userRole, setUserRole] = useState(null); // 'penguji1', 'penguji2', atau null
   const [penilaianData, setPenilaianData] = useState(null); // Menyimpan semua data penilaian
   const [currentUserNpk, setCurrentUserNpk] = useState(null);
@@ -161,7 +162,7 @@ export default function PenilaianPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedNpk, tanggal, topik, currentUserNpk, defaultNilaiMatrix]); // ✅ TAMBAHKAN INI
+  }, [selectedNpk, tanggal, topik, currentUserNpk, defaultNilaiMatrix]); //  TAMBAHKAN INI
 
   // 🔥 PANGGIL fungsi yang sudah dipindahkan
 
@@ -214,14 +215,14 @@ export default function PenilaianPage() {
 
   const submitDataPresentasi = async () => {
     if (!tempTanggal || !tempTopik || !tempNama) {
-      alert("Harap lengkapi semua field!");
+      toast.error("Harap lengkapi semua field!");
       return;
     }
 
     const today = new Date();
     const selectedDate = new Date(tempTanggal);
     if (selectedDate > today) {
-      alert("Tanggal presentasi tidak boleh lebih dari hari ini!");
+      toast.error("Tanggal presentasi tidak boleh lebih dari hari ini!");
       return;
     }
 
@@ -234,7 +235,7 @@ export default function PenilaianPage() {
       );
 
       if (!selectedPerawat) {
-        alert("Perawat tidak ditemukan! Pastikan nama yang diketik benar.");
+        toast.error("Perawat tidak ditemukan! Pastikan nama yang diketik benar.");
         return;
       }
 
@@ -269,15 +270,15 @@ export default function PenilaianPage() {
 
 
 
-        alert("Data presentasi berhasil dibuat!");
+        toast.success("Data presentasi berhasil dibuat!");
         loadPenilaian();
       } else {
         console.error("Gagal membuat data:", result);
-        alert(result.message || "Gagal menyimpan data presentasi");
+        toast.error(result.message || "Gagal menyimpan data presentasi");
       }
     } catch (e) {
       console.error("Error submit data presentasi:", e);
-      alert("Terjadi kesalahan saat menyimpan data");
+      toast.error("Terjadi kesalahan saat menyimpan data");
     } finally {
       setIsSubmitting(false);
     }
@@ -350,7 +351,7 @@ export default function PenilaianPage() {
 
   const submitPenilaian = async (pengujiNumber) => {
     if (!canEdit(pengujiNumber)) {
-      alert("Anda tidak dapat mengedit form ini");
+      toast.error("Anda tidak dapat mengedit form ini");
       return;
     }
 
@@ -360,7 +361,7 @@ export default function PenilaianPage() {
     );
 
     if (!hasValue) {
-      alert("Harap isi minimal satu nilai sebelum menyimpan!");
+      toast.error("Harap isi minimal satu nilai sebelum menyimpan!");
       return;
     }
 
@@ -390,20 +391,20 @@ export default function PenilaianPage() {
 
       if (result.success) {
         console.log("Response dari backend:", result);
-        alert(`Penilaian Penguji ${pengujiNumber} berhasil disimpan!`);
+        toast.success(`Penilaian Penguji ${pengujiNumber} berhasil disimpan!`);
 
-        // ✅ UPDATE STATE DENGAN DATA TERBARU
+        //  UPDATE STATE DENGAN DATA TERBARU
         setPenilaianData(result.data);
 
-        // ✅ REFRESH DATA UNTUK SINKRONISASI LENGKAP
+        //  REFRESH DATA UNTUK SINKRONISASI LENGKAP
         await loadPenilaian();
 
       } else {
-        alert(result.message || "Gagal menyimpan penilaian");
+        toast.error(result.message || "Gagal menyimpan penilaian");
       }
     } catch (error) {
       console.error("Error submitting penilaian:", error);
-      alert("Gagal menyimpan penilaian!");
+      toast.error("Gagal menyimpan penilaian!");
     } finally {
       setIsSubmitting(false);
     }
@@ -412,7 +413,7 @@ export default function PenilaianPage() {
   // Finalisasi penilaian
   const finalizePenilaian = async () => {
     if (penilaianData?.status !== "penguji2_selesai") {
-      alert("Kedua penguji harus menyelesaikan penilaian terlebih dahulu!");
+      toast.error("Kedua penguji harus menyelesaikan penilaian terlebih dahulu!");
       return;
     }
 
@@ -433,17 +434,17 @@ export default function PenilaianPage() {
 
       const result = await res.json();
       if (result.success) {
-        alert("Penilaian berhasil difinalisasi!");
+        toast.success("Penilaian berhasil difinalisasi!");
 
         setPenilaianData(result.data);
         await loadPenilaian();
 
       } else {
-        alert(result.message || "Gagal memfinalisasi penilaian");
+        toast.error(result.message || "Gagal memfinalisasi penilaian");
       }
     } catch (error) {
       console.error("Error finalizing penilaian:", error);
-      alert("Gagal memfinalisasi penilaian!");
+      toast.error("Gagal memfinalisasi penilaian!");
     }
   };
 

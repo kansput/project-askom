@@ -1,6 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./styles/globals.css";
-import { Toaster } from "react-hot-toast"; // ✅ import toaster
+import { Toaster } from "react-hot-toast"; 
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +30,7 @@ export default function RootLayout({ children }) {
       >
         {children}
 
-        {/* ✅ Toaster dengan custom style */}
+        {/*  Toaster dengan custom style */}
         <Toaster
           position="top-right"
           toastOptions={{

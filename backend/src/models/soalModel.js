@@ -1,44 +1,36 @@
-// models/soalModel.js
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
 const Soal = sequelize.define("Soal", {
-  id: { 
-    type: DataTypes.INTEGER, 
-    autoIncrement: true, 
-    primaryKey: true 
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  batchSoalId: { type: DataTypes.INTEGER, allowNull: false, index: true },
+  pertanyaan: { type: DataTypes.TEXT, allowNull: false }, // boleh HTML
+  gambar: { type: DataTypes.STRING, allowNull: true },    // path file
+  opsi: {
+    type: DataTypes.JSONB,  // pakai JSONB kalau Postgres; JSON kalau MySQL
+    allowNull: false,
+    defaultValue: [],
+    validate: {
+      isValid(val) {
+        if (!Array.isArray(val) || val.length < 2 || val.length > 5) {
+          throw new Error("Opsi harus 2–5 item");
+        }
+        const K = val.map(o => o.kode);
+        const T = val.map(o => o.text);
+        const validKode = K.every(k => ["A","B","C","D","E"].includes(k));
+        const uniqueKode = new Set(K).size === K.length;
+        const filledText = T.every(t => typeof t === "string" && t.trim().length > 0);
+        if (!validKode || !uniqueKode || !filledText) throw new Error("Format opsi tidak valid");
+      }
+    }
   },
-
-  batchSoalId: { 
-    type: DataTypes.INTEGER, 
-    allowNull: false 
-  },
-
-  pertanyaan: { 
-    type: DataTypes.TEXT, 
-    allowNull: false 
-  },
-
-  gambar: { 
-    type: DataTypes.STRING, 
-    allowNull: true 
-  },
-
-  // ✅ simpan opsi pilihan sebagai JSON array
-  opsi: { 
-    type: DataTypes.JSON, 
-    allowNull: false, 
-    defaultValue: []   // supaya gak error waktu sync
-  },
-
-  // simpan kode jawaban benar (misal "A", "B", "C", "D")
-  jawabanBenar: { 
-    type: DataTypes.STRING, 
-    allowNull: false 
-  },
+  jawabanBenar: {
+    type: DataTypes.ENUM("A","B","C","D","E"),
+    allowNull: false
+  }
 }, {
   tableName: "Soal",
-  timestamps: true,
+  timestamps: true
 });
 
 export default Soal;

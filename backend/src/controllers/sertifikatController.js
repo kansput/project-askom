@@ -30,7 +30,7 @@ export const createSertifikat = async (req, res) => {
     }
 
     if (!req.file) {
-      return res.status(400).json({ success: false, message: "❌ File sertifikat wajib diupload" });
+      return res.status(400).json({ success: false, message: " File sertifikat wajib diupload" });
     }
 
     // Generate nama unik
@@ -51,11 +51,11 @@ export const createSertifikat = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "✅ Sertifikat berhasil disimpan",
+      message: " Sertifikat berhasil disimpan",
       data: sertifikat,
     });
   } catch (error) {
-    console.error("❌ Error createSertifikat:", error);
+    console.error(" Error createSertifikat:", error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -86,7 +86,7 @@ export const getAllSertifikat = async (req, res) => {
 
     return res.json({ success: true, data: result, total: result.length });
   } catch (error) {
-    console.error("❌ Error getAllSertifikat:", error);
+    console.error(" Error getAllSertifikat:", error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -103,7 +103,7 @@ export const getSertifikatByUser = async (req, res) => {
 
     return res.json({ success: true, data, total: data.length });
   } catch (error) {
-    console.error("❌ Error getSertifikatByUser:", error);
+    console.error(" Error getSertifikatByUser:", error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -125,9 +125,9 @@ export const deleteSertifikat = async (req, res) => {
     }
 
     await sertifikat.destroy();
-    return res.json({ success: true, message: "✅ Sertifikat berhasil dihapus" });
+    return res.json({ success: true, message: " Sertifikat berhasil dihapus" });
   } catch (error) {
-    console.error("❌ Error deleteSertifikat:", error);
+    console.error(" Error deleteSertifikat:", error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };

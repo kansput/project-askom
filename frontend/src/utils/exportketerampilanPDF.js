@@ -273,6 +273,6 @@ export const handleExportPDF = async (item) => {
         window.open(pdfUrl, "_blank");
     } catch (err) {
         console.error("Error generating PDF:", err);
-        alert("Gagal membuat PDF. Pastikan logo ada di folder /public.");
+        toast.error("Gagal membuat PDF. Pastikan logo ada di folder /public.");
     }
 };

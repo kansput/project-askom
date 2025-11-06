@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Upload, FileText, Calendar, CheckCircle2, AlertCircle, Plus, Award, Building2, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { toast } from "react-hot-toast";
 
 export default function SertifikatPage() {
   const [sertifikatUmum, setSertifikatUmum] = useState([]);
@@ -37,7 +38,7 @@ export default function SertifikatPage() {
     const setList = type === "umum" ? setSertifikatUmum : setSertifikatKhusus;
 
     if (list.length >= 10) {
-      alert("Maksimal 10 sertifikat per kategori!");
+      toast.error("Maksimal 10 sertifikat per kategori!");
       return;
     }
 
@@ -67,11 +68,12 @@ export default function SertifikatPage() {
     const totalAfterDelete = newList.length + otherList.length;
 
     if (totalAfterDelete === 0) {
-      alert("❌ Minimal harus ada 1 sertifikat (tidak boleh menghapus semua)!");
+      toast.error(" Minimal harus ada 1 sertifikat (tidak boleh menghapus semua)!");
       return;
     }
 
     setList(newList);
+    toast.success("Sertifikat berhasil dihapus!");
   };
 
   const updateSertifikat = (type, id, field, value) => {
@@ -109,19 +111,19 @@ export default function SertifikatPage() {
 
   const validateSertifikat = (sertifikat, index, type) => {
     if (!sertifikat.judul) {
-      alert(`Sertifikat ${type} #${index + 1}: Judul belum diisi!`);
+      toast.error(`Sertifikat ${type} #${index + 1}: Judul belum diisi!`);
       return false;
     }
     if (!sertifikat.tanggal) {
-      alert(`Sertifikat ${type} #${index + 1}: Tanggal belum diisi!`);
+      toast.error(`Sertifikat ${type} #${index + 1}: Tanggal belum diisi!`);
       return false;
     }
     if (!sertifikat.penyelenggara) {
-      alert(`Sertifikat ${type} #${index + 1}: Penyelenggara belum diisi!`);
+      toast.error(`Sertifikat ${type} #${index + 1}: Penyelenggara belum diisi!`);
       return false;
     }
     if (!sertifikat.file) {
-      alert(`Sertifikat ${type} #${index + 1}: File belum diupload!`);
+      toast.error(`Sertifikat ${type} #${index + 1}: File belum diupload!`);
       return false;
     }
     return true;
@@ -136,11 +138,11 @@ export default function SertifikatPage() {
     formData.append("file", sertifikat.file);
 
     try {
-      const token = localStorage.getItem("token"); // ✅ Ambil token
+      const token = localStorage.getItem("token"); // Ambil token
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sertifikat`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // ✅ Tambahkan headers
+          Authorization: `Bearer ${token}`, // Tambahkan headers
         },
         body: formData,
       });
@@ -155,7 +157,7 @@ export default function SertifikatPage() {
 
     // Validasi: minimal 1 sertifikat total
     if (totalSertifikat === 0) {
-      alert("❌ Minimal harus mengupload 1 sertifikat (Umum atau Khusus)!");
+      toast.error(" Minimal harus mengupload 1 sertifikat (Umum atau Khusus)!");
       return;
     }
 
@@ -186,7 +188,7 @@ export default function SertifikatPage() {
       const results = await Promise.all(uploadPromises);
 
       const totalSertifikat = sertifikatUmum.length + sertifikatKhusus.length;
-      alert(`✅ Berhasil! ${totalSertifikat} sertifikat (${sertifikatUmum.length} Umum, ${sertifikatKhusus.length} Khusus) telah tersimpan ke database!`);
+      toast.success(` Berhasil! ${totalSertifikat} sertifikat (${sertifikatUmum.length} Umum, ${sertifikatKhusus.length} Khusus) telah tersimpan ke database!`);
 
       // Reset form
       setSertifikatUmum([{
@@ -212,7 +214,7 @@ export default function SertifikatPage() {
 
     } catch (error) {
       console.error("Error uploading sertifikat:", error);
-      alert(`❌ Terjadi kesalahan: ${error.message}`);
+      toast.error(` Terjadi kesalahan: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -229,7 +231,7 @@ export default function SertifikatPage() {
       });
 
       if (response.ok) {
-        alert("Sertifikat berhasil dihapus dari database!");
+        toast.success("Sertifikat berhasil dihapus dari database!");
         fetchSertifikat();
       } else {
         const error = await response.json();
@@ -237,7 +239,7 @@ export default function SertifikatPage() {
       }
     } catch (error) {
       console.error("Error deleting sertifikat:", error);
-      alert("Terjadi kesalahan saat menghapus");
+      toast.error("Terjadi kesalahan saat menghapus");
     }
   };
 

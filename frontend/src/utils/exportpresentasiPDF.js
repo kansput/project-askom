@@ -191,6 +191,6 @@ export const handleExportPresentasiPDF = async (item) => {
         window.open(url, "_blank");
     } catch (err) {
         console.error("Error generating PDF:", err);
-        alert("Gagal membuat PDF presentasi");
+        toast.error("Gagal membuat PDF presentasi");
     }
 };

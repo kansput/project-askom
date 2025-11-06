@@ -3,16 +3,17 @@ import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import morgan from "morgan";
-import fs from "fs"; // ✅ TAMBAHKAN IMPORT INI
+import fs from "fs"; // 
 import sequelize from "./config/db.js";
+import "./models/index.js";
 
-// ✅ Import models SEBELUM routes (penting untuk relasi)
+
 import User from "./models/userModel.js";
 import StrDocument from "./models/StrModel.js";
 import Sertifikat from "./models/sertifikatModel.js";
 import KredoDokumen from "./models/kredokumenModel.js";
 
-// ✅ Import routes
+
 import authRoutes from "./routes/authRoutes.js";
 import perawatRoutes from "./routes/perawatRoutes.js";
 import fileRoutes from "./routes/fileRoutes.js";
@@ -35,7 +36,7 @@ const PORT = process.env.PORT || 5000;
 // MIDDLEWARE CONFIGURATION
 // ===================================
 
-// ✅ CORS Configuration
+// CORS Configuration
 app.use(cors({
   origin: [
     `${process.env.NEXT_PUBLIC_WEBSITE_URL}`,
@@ -47,14 +48,14 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-// ✅ Logging
+// Logging
 app.use(morgan("dev"));
 
-// ✅ Body parser
+// Body parser
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// ✅ Serve static files untuk uploads
+// Serve static files untuk uploads
 const uploadsPath = path.join(process.cwd(), "src", "uploads");
 console.log("📁 Serving static files from:", uploadsPath);
 
@@ -75,7 +76,7 @@ app.use("/api/penilaian", penilaianPresentasiRoutes);
 app.use("/api/penilaian-keterampilan", penilaianKeterampilanRoutes);
 
 
-// ✅ Health check endpoint
+// Health check endpoint
 app.get("/", (req, res) => {
   res.json({ 
     success: true, 
@@ -85,7 +86,7 @@ app.get("/", (req, res) => {
   });
 });
 
-// ✅ Test uploads endpoint
+// Test uploads endpoint
 app.get("/test-uploads", (req, res) => {
   const testPath = path.join(process.cwd(), "src", "uploads", "kredokumen");
   const exists = fs.existsSync(testPath);
@@ -99,11 +100,11 @@ app.get("/test-uploads", (req, res) => {
   });
 });
 
-// ✅ 404 Handler
+// 404 Handler
 app.use((req, res) => {
   res.status(404).json({ 
     success: false, 
-    message: `❌ Route ${req.originalUrl} not found`,
+    message: ` Route ${req.originalUrl} not found`,
     availableRoutes: [
       "/api/auth",
       "/api/perawat", 
@@ -114,9 +115,9 @@ app.use((req, res) => {
   });
 });
 
-// ✅ Global Error Handler
+// Global Error Handler
 app.use((err, req, res, next) => {
-  console.error("❌ Global Error:", err.stack);
+  console.error(" Global Error:", err.stack);
   res.status(err.status || 500).json({
     success: false,
     message: err.message || "Internal Server Error",
@@ -130,11 +131,11 @@ app.use((err, req, res, next) => {
 const startServer = async () => {
   try {
     await sequelize.authenticate();
-    console.log("✅ Database connection established successfully");
+    console.log("Database connection established successfully");
 
     // Sync database
     await sequelize.sync({ alter: true });
-    console.log("✅ Database models synced successfully");
+    console.log("Database models synced successfully");
 
     console.log("📦 Registered Models:", Object.keys(sequelize.models));
 
@@ -142,40 +143,40 @@ const startServer = async () => {
     const uploadsDir = path.join(process.cwd(), "src", "uploads");
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
-      console.log("✅ Created uploads directory:", uploadsDir);
+      console.log("Created uploads directory:", uploadsDir);
     }
 
     const kredokumenDir = path.join(uploadsDir, "kredokumen");
     if (!fs.existsSync(kredokumenDir)) {
       fs.mkdirSync(kredokumenDir, { recursive: true });
-      console.log("✅ Created kredokumen directory:", kredokumenDir);
+      console.log("Created kredokumen directory:", kredokumenDir);
     }
 
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Server running at http://0.0.0.0:${PORT}`);
       console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`📁 Uploads path: ${uploadsPath}`);
-      console.log(`🔐 JWT Secret: ${process.env.JWT_SECRET ? '✅ Set' : '❌ Not Set'}`);
+      console.log(`🔐 JWT Secret: ${process.env.JWT_SECRET ? 'Set' : ' Not Set'}`);
     });
 
   } catch (error) {
-    console.error("❌ Failed to start server:", error);
+    console.error(" Failed to start server:", error);
     process.exit(1);
   }
 };
 
-// ✅ Handle uncaught errors
+// Handle uncaught errors
 process.on('uncaughtException', (error) => {
-  console.error('❌ Uncaught Exception:', error);
+  console.error(' Uncaught Exception:', error);
   process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  console.error(' Unhandled Rejection at:', promise, 'reason:', reason);
   process.exit(1);
 });
 
-// ✅ Graceful shutdown
+// Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('👋 SIGTERM received, closing server...');
   await sequelize.close();

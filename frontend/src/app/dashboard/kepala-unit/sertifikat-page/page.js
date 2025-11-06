@@ -3,15 +3,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import {
-  FileText,
-  Download,
-  Search,
-  ChevronDown,
-  ChevronUp,
-  User,
-  AlertCircle,
-} from "lucide-react";
+import { FileText, Download, Search, ChevronDown, ChevronUp, User, AlertCircle, Trash2 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export default function SertifikatKepalaUnitPage() {
   const router = useRouter();
@@ -68,8 +61,13 @@ export default function SertifikatKepalaUnitPage() {
           throw new Error(result.message || "Gagal memuat data sertifikat");
         }
       } catch (err) {
-        console.error("❌ Error fetch sertifikat:", err);
+        console.error(" Error fetch sertifikat:", err);
         setError(err.message);
+        if (err.message.includes("401") || err.message.includes("403")) {
+          toast.error("Sesi telah berakhir, silakan login kembali");
+        } else {
+          toast.error("Gagal memuat data sertifikat");
+        }
         if (
           err.message.includes("401") ||
           err.message.includes("403") ||
@@ -106,14 +104,14 @@ export default function SertifikatKepalaUnitPage() {
 
       const result = await res.json();
       if (res.ok && result.success) {
-        alert("✅ Sertifikat berhasil dihapus!");
+        toast.success(" Sertifikat berhasil dihapus!");
         setDocs((prev) => prev.filter((doc) => doc.id !== id));
       } else {
-        alert(`❌ Gagal menghapus: ${result.message || "Terjadi kesalahan"}`);
+        toast.error(` Gagal menghapus: ${result.message || "Terjadi kesalahan"}`);
       }
     } catch (error) {
       console.error("Error delete sertifikat:", error);
-      alert("Terjadi kesalahan saat menghapus");
+      toast.error("Terjadi kesalahan saat menghapus");
     }
   };
 
@@ -323,10 +321,10 @@ export default function SertifikatKepalaUnitPage() {
                       <td className="px-4 py-3 text-sm">
                         <button
                           onClick={() => handleDelete(doc.id)}
-                          className="p-2 bg-red-50 hover:bg-red-100 rounded transition text-red-600 border border-red-200"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-all"
                           title="Hapus Sertifikat"
                         >
-                          🗑️
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </td>
 

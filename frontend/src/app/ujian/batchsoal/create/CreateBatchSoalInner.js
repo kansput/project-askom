@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { BookOpen, Plus, Save, Image, CheckCircle, Trash2, AlertCircle } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import NextImage from "next/image";
 
 export default function CreateBatchSoalPage() {
@@ -212,11 +212,8 @@ export default function CreateBatchSoalPage() {
             formData.append("pertanyaan", soal.pertanyaan);
             formData.append("jawabanBenar", soal.jawabanBenar);
 
-            // ✅ perbaikan di sini
-            formData.append(
-                "opsi",
-                JSON.stringify(soal.opsi.map((o) => `${o.kode}. ${o.text}`))
-            );
+            //  perbaikan di sini
+            formData.append("opsi", JSON.stringify(soal.opsi));
 
             if (soal.gambarFile) {
                 formData.append("gambar", soal.gambarFile);

@@ -113,7 +113,7 @@ export default function DokumenPage() {
 
     setIsSubmitting(true);
 
-    // ✅ Gunakan fallback URL
+
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
     console.log('🔍 Upload ke:', `${API_BASE_URL}/api/kredokumen/upload`);
 
@@ -152,7 +152,7 @@ export default function DokumenPage() {
         toast.error(result.message || 'Gagal mengupload dokumen.');
       }
     } catch (error) {
-      console.error('❌ Upload error:', error);
+      console.error(' Upload error:', error);
       toast.error('Terjadi kesalahan saat mengupload dokumen.');
     } finally {
       setIsSubmitting(false);
@@ -218,8 +218,8 @@ export default function DokumenPage() {
           </label>
           <input
             type="date"
-            value={tanggal} // ✅ Ganti bulan -> tanggal
-            onChange={(e) => setTanggal(e.target.value)} // ✅ Ganti setBulan -> setTanggal
+            value={tanggal} 
+            onChange={(e) => setTanggal(e.target.value)} 
             required
             className="border-2 border-gray-300 rounded-lg px-3 py-2 w-full max-w-xs bg-white text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
           />
@@ -427,8 +427,8 @@ export default function DokumenPage() {
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={!allFilesUploaded || !tanggal || isSubmitting} // ✅ Ganti !bulan -> !tanggal
-            className={`w-full px-5 py-2.5 text-sm rounded-lg transition-all font-semibold shadow-md flex items-center justify-center gap-2 group ${allFilesUploaded && tanggal && !isSubmitting // ✅ Ganti bulan -> tanggal
+            disabled={!allFilesUploaded || !tanggal || isSubmitting} //  Ganti !bulan -> !tanggal
+            className={`w-full px-5 py-2.5 text-sm rounded-lg transition-all font-semibold shadow-md flex items-center justify-center gap-2 group ${allFilesUploaded && tanggal && !isSubmitting //  Ganti bulan -> tanggal
               ? "bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 hover:shadow-lg"
               : "bg-gray-200 text-gray-500 cursor-not-allowed"
               }`}
@@ -440,9 +440,9 @@ export default function DokumenPage() {
               </>
             ) : (
               <>
-                <CheckCircle2 className={`w-4 h-4 transition-transform ${allFilesUploaded && tanggal ? "group-hover:scale-110" : "" // ✅ Ganti bulan -> tanggal
+                <CheckCircle2 className={`w-4 h-4 transition-transform ${allFilesUploaded && tanggal ? "group-hover:scale-110" : "" //  Ganti bulan -> tanggal
                   }`} />
-                {allFilesUploaded && tanggal // ✅ Ganti bulan -> tanggal
+                {allFilesUploaded && tanggal //  Ganti bulan -> tanggal
                   ? "Kirim Kedua Dokumen"
                   : "Upload Kedua Dokumen Terlebih Dahulu"}
               </>

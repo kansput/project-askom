@@ -12,45 +12,7 @@ export default function PerawatDashboard() {
   const [greetingIndex, setGreetingIndex] = useState(0);
 
   // Array sapaan multibahasa
-  const greetings = [
-    "Hello",
-    "こんにちは",
-    "Bonjour",
-    "Hola",
-    "Ciao",
-    "안녕하세요",
-    "Namaste",
-    "Guten Tag",
-    "你好",
-    "Olá",
-    "Привет",
-    "Merhaba",
-    "สวัสดี",
-    "As-salamu alaykum",
-    "Jambo",
-    "Aloha",
-    "Kia ora",
-    "Hej",
-    "Dobrý den",
-    "Dzień dobry",
-    "Γεια σας",
-    "Buna ziua",
-    "Zdravo",
-    "Xin chào",
-    "Sabaidee",
-    "Mingalaba",
-    "Vanakkam",
-    "Talofa",
-    "Mālō e lelei",
-    "Sawubona",
-    "Molo",
-    "Tere",
-    "Tungjatjeta",
-    "Sain baina uu?",
-    "Chào bạn",
-    "Apa khabar?",
-    "Halo"
-  ];
+  const greetings = [ "Hello", "こんにちは", "Bonjour", "Hola", "Ciao", "안녕하세요", "Namaste", "Guten Tag", "你好", "Olá", "Привет", "Merhaba", "สวัสดี", "As-salamu alaykum", "Jambo", "Aloha", "Kia ora", "Hej", "Dobrý den", "Dzień dobry", "Γεια σας", "Buna ziua", "Zdravo", "Xin chào", "Sabaidee", "Mingalaba", "Vanakkam", "Talofa", "Mālō e lelei", "Sawubona", "Molo", "Tere", "Tungjatjeta", "Sain baina uu?", "Chào bạn", "Apa khabar?", "Halo" ];
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
@@ -243,7 +205,7 @@ export default function PerawatDashboard() {
               1 Menu
             </span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-5">
             <CardItem image="/starting.png" title="Ujian Askom" href="/dashboard/perawat/askom" />
           </div>
         </section>
@@ -266,7 +228,7 @@ export default function PerawatDashboard() {
               1 Menu
             </span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-5">
             <CardItem image="/file-center.png" title="File Center" href="/download/" />
           </div>
         </section>

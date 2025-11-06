@@ -49,7 +49,7 @@ function normalizeRow(row) {
 async function run() {
   try {
     await sequelize.authenticate();
-    console.log("✅ DB Connected");
+    console.log(" DB Connected");
 
     // Ganti dengan path file Excel Anda
     const file = path.join(__dirname, "../data/inject.xlsx");
@@ -109,9 +109,9 @@ async function run() {
     }
 
     await User.bulkCreate(batch, { ignoreDuplicates: true });
-    console.log(`✅ Inserted ${batch.length} users`);
+    console.log(` Inserted ${batch.length} users`);
   } catch (e) {
-    console.error("❌ Error seeding:", e);
+    console.error(" Error seeding:", e);
   } finally {
     await sequelize.close();
   }

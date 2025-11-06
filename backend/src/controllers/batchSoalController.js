@@ -17,7 +17,7 @@ export const createBatchSoal = async (req, res) => {
 
     res.json({ success: true, message: "Batch soal berhasil dibuat", data: batch });
   } catch (err) {
-    console.error("❌ Error createBatchSoal:", err);
+    console.error(" Error createBatchSoal:", err);
     res.status(500).json({ success: false, message: "Gagal membuat batch soal" });
   }
 };
@@ -25,44 +25,99 @@ export const createBatchSoal = async (req, res) => {
 // ========== TAMBAH SOAL KE BATCH ==========
 export const addSoalToBatch = async (req, res) => {
   try {
+    // 🔒 hanya kepala unit
     if (req.user.role !== "kepala unit") {
-      return res.status(403).json({ success: false, message: "Hanya kepala unit yang bisa menambah soal" });
+      return res.status(403).json({
+        success: false,
+        message: "Hanya kepala unit yang bisa menambah soal",
+      });
     }
 
     const { id } = req.params; // batchSoalId
     let { pertanyaan, jawabanBenar, opsi } = req.body;
 
+    // 🧩 Pastikan opsi berupa JSON array
     if (typeof opsi === "string") {
       try {
         opsi = JSON.parse(opsi);
-      } catch {
-        return res.status(400).json({ success: false, message: "Format opsi tidak valid" });
+      } catch (err) {
+        return res.status(400).json({
+          success: false,
+          message: "Format opsi tidak valid (harus JSON array objek)",
+        });
       }
     }
 
-    if (!pertanyaan || !jawabanBenar || !opsi || opsi.length < 2) {
-      return res.status(400).json({ success: false, message: "Pertanyaan, jawabanBenar, dan minimal 2 opsi diperlukan" });
+    // 🧠 Validasi dasar
+    if (!pertanyaan || !jawabanBenar || !Array.isArray(opsi)) {
+      return res.status(400).json({
+        success: false,
+        message: "Pertanyaan, jawabanBenar, dan opsi wajib diisi",
+      });
     }
 
+    if (opsi.length < 2 || opsi.length > 5) {
+      return res.status(400).json({
+        success: false,
+        message: "Jumlah opsi harus antara 2–5",
+      });
+    }
+
+    // 🧠 Validasi isi setiap opsi
+    const allowedCodes = ["A", "B", "C", "D", "E"];
+    const formattedOpsi = opsi.map((o, i) => {
+      if (!o || typeof o !== "object") {
+        throw new Error(`Format opsi ke-${i + 1} tidak valid`);
+      }
+      const kode = String(o.kode || "").trim().toUpperCase();
+      const text = String(o.text || "").trim();
+      if (!allowedCodes.includes(kode))
+        throw new Error(`Kode opsi ${kode} tidak valid (harus A–E)`);
+      if (!text)
+        throw new Error(`Teks opsi ${kode} tidak boleh kosong`);
+      return { kode, text };
+    });
+
+    // 🧩 Validasi jawaban benar
+    jawabanBenar = String(jawabanBenar).trim().toUpperCase();
+    if (!allowedCodes.includes(jawabanBenar)) {
+      return res.status(400).json({
+        success: false,
+        message: "jawabanBenar harus antara A–E",
+      });
+    }
+
+    // 🖼️ Simpan gambar jika ada
     let gambarPath = null;
     if (req.file) {
       gambarPath = `/uploads/ujian/${req.file.filename}`;
     }
 
+    // 💾 Simpan ke DB
     const soal = await Soal.create({
       batchSoalId: id,
       pertanyaan,
       gambar: gambarPath,
       jawabanBenar,
-      opsi, // ✅ simpan langsung array string
+      opsi: formattedOpsi, k
     });
 
-    res.json({ success: true, message: "Soal berhasil ditambahkan ke batch", data: soal });
+    return res.json({
+      success: true,
+      message: "Soal berhasil ditambahkan ke batch",
+      data: soal,
+    });
+
   } catch (err) {
-    console.error("❌ Error addSoalToBatch:", err);
-    res.status(500).json({ success: false, message: "Gagal menambah soal ke batch" });
+    console.error(" Error addSoalToBatch:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Gagal menambah soal ke batch",
+      error: err.message,
+    });
   }
 };
+
 
 // ========== UPDATE SOAL ==========
 export const updateSoalInBatch = async (req, res) => {
@@ -99,7 +154,7 @@ export const updateSoalInBatch = async (req, res) => {
 
     res.json({ success: true, message: "Soal berhasil diperbarui", data: soal });
   } catch (err) {
-    console.error("❌ Error updateSoalInBatch:", err);
+    console.error(" Error updateSoalInBatch:", err);
     res.status(500).json({ success: false, message: "Gagal update soal" });
   }
 };
@@ -119,7 +174,7 @@ export const deleteSoalInBatch = async (req, res) => {
 
     res.json({ success: true, message: "Soal berhasil dihapus" });
   } catch (err) {
-    console.error("❌ Error deleteSoalInBatch:", err);
+    console.error(" Error deleteSoalInBatch:", err);
     res.status(500).json({ success: false, message: "Gagal hapus soal" });
   }
 };
@@ -131,7 +186,7 @@ export const getSoalInBatch = async (req, res) => {
     const soal = await Soal.findAll({ where: { batchSoalId: id } });
     res.json({ success: true, data: soal });
   } catch (err) {
-    console.error("❌ Error getSoalInBatch:", err);
+    console.error(" Error getSoalInBatch:", err);
     res.status(500).json({ success: false, message: "Gagal mengambil soal di batch" });
   }
 };
@@ -144,7 +199,7 @@ export const getAllBatchSoal = async (req, res) => {
     });
     res.json({ success: true, data: batchList });
   } catch (err) {
-    console.error("❌ Error getAllBatchSoal:", err);
+    console.error(" Error getAllBatchSoal:", err);
     res.status(500).json({ success: false, message: "Gagal mengambil daftar batch soal" });
   }
 };
@@ -161,7 +216,7 @@ export const getBatchById = async (req, res) => {
     }
     res.json({ success: true, data: batch });
   } catch (err) {
-    console.error("❌ Error getBatchById:", err);
+    console.error(" Error getBatchById:", err);
     res.status(500).json({ success: false, message: "Gagal mengambil detail batch" });
   }
 };
@@ -183,7 +238,7 @@ export const updateBatchSoal = async (req, res) => {
 
     res.json({ success: true, message: "Batch soal berhasil diperbarui", data: batch });
   } catch (err) {
-    console.error("❌ Error updateBatchSoal:", err);
+    console.error(" Error updateBatchSoal:", err);
     res.status(500).json({ success: false, message: "Gagal memperbarui batch soal" });
   }
 };
@@ -203,7 +258,7 @@ export const deleteBatchSoal = async (req, res) => {
 
     res.json({ success: true, message: "Batch soal berhasil dihapus" });
   } catch (err) {
-    console.error("❌ Error deleteBatchSoal:", err);
+    console.error(" Error deleteBatchSoal:", err);
     res.status(500).json({ success: false, message: "Gagal menghapus batch soal" });
   }
 };

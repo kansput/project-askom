@@ -1,30 +1,42 @@
 import { Router } from "express";
 import { verifyToken } from "../middlewares/authMiddleware.js";
-import { createUjian, startUjian, getAllUjian, deleteUjian, getUjianById, stopUjian, submitUjian } from "../controllers/ujianController.js";
-
+import {
+   createUjian,
+   startUjian,
+   stopUjian,
+   getAllUjian,
+   getUjianById,
+   deleteUjian,
+   submitUjian,
+   startUjianPeserta,
+   getHasilUjian,
+} from "../controllers/ujianController.js";
 
 const router = Router();
 
-router.use(verifyToken);
+/* ================================================================
+   🧩 ROUTE HASIL UJIAN — TARUH PALING ATAS!!!
+   ================================================================ */
+router.get("/:id/hasil", verifyToken, getHasilUjian);
 
-// buat ujian draft (pilih batch soal)
-router.post("/", createUjian);
+/* ================================================================
+   📘 DETAIL UJIAN
+   ================================================================ */
+router.get("/:id", verifyToken, getUjianById);
 
-// start ujian (ubah status draft -> active)
-router.post("/:id/start", startUjian);
+/* ================================================================
+   📘 KEPALA UNIT
+   ================================================================ */
+router.post("/", verifyToken, createUjian);
+router.post("/:id/start-global", verifyToken, startUjian);
+router.post("/:id/stop", verifyToken, stopUjian);
+router.delete("/:id", verifyToken, deleteUjian);
+router.get("/", verifyToken, getAllUjian);
 
-// dapatkan ujian
-router.get("/", getAllUjian);
-// delete draft ujian
-router.delete("/:id", deleteUjian);
-
-// dapatkan ujian by ID
-router.get("/:id", getUjianById);
-
-// stop ujian (ubah status active -> selesai)
-router.post("/:id/stop", stopUjian);
-
-//  submitUjian
-router.post("/:id/submit", submitUjian);
+/* ================================================================
+   🧑‍⚕️ PERAWAT
+   ================================================================ */
+router.post("/:id/start", verifyToken, startUjianPeserta);
+router.post("/:id/submit", verifyToken, submitUjian);
 
 export default router;
