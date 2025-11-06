@@ -12,7 +12,13 @@ export default function KepalaUnitDashboard() {
   const [greetingIndex, setGreetingIndex] = useState(0);
 
   // Array sapaan multibahasa
-  const greetings = ["Hello", "こんにちは", "Bonjour", "Hola", "Ciao", "안녕하세요", "Namaste", "Guten Tag", "你好", "Olá", "Привет", "Merhaba", "สวัสดี", "As-salamu alaykum", "Jambo", "Aloha", "Kia ora", "Hej", "Dobrý den", "Dzień dobry", "Γεια σας", "Buna ziua", "Zdravo", "Xin chào", "Sabaidee", "Mingalaba", "Vanakkam", "Talofa", "Mālō e lelei", "Sawubona", "Molo", "Tere", "Tungjatjeta", "Sain baina uu?", "Chào bạn", "Apa khabar?", "Halo"];
+  const greetings = [
+    "Hello", "こんにちは", "Bonjour", "Hola", "Ciao", "안녕하세요", "Namaste", "Guten Tag", "你好", "Olá",
+    "Привет", "Merhaba", "สวัสดี", "As-salamu alaykum", "Jambo", "Aloha", "Kia ora", "Hej", "Dobrý den",
+    "Dzień dobry", "Γεια σας", "Buna ziua", "Zdravo", "Xin chào", "Sabaidee", "Mingalaba", "Vanakkam",
+    "Talofa", "Mālō e lelei", "Sawubona", "Molo", "Tere", "Tungjatjeta", "Sain baina uu?", "Chào bạn",
+    "Apa khabar?", "Halo"
+  ];
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
@@ -122,7 +128,7 @@ export default function KepalaUnitDashboard() {
       <Navbar title="Dashboard Kepala Unit" />
 
       <main className="flex-grow p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
-        {/* Welcome Section - Enhanced */}
+        {/* Welcome Section */}
         <div className="mb-8">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -154,7 +160,7 @@ export default function KepalaUnitDashboard() {
               </div>
               <div className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-lg shadow-md">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806a3.42 3.42 0 014.438 0a3.42 3.42 0 001.946.806a3.42 3.42 0 013.138 3.138a3.42 3.42 0 00.806 1.946a3.42 3.42 0 010 4.438a3.42 3.42 0 00-.806 1.946a3.42 3.42 0 01-3.138 3.138a3.42 3.42 0 00-1.946.806a3.42 3.42 0 01-4.438 0a3.42 3.42 0 00-1.946-.806a3.42 3.42 0 01-3.138-3.138a3.42 3.42 0 00-.806-1.946a3.42 3.42 0 010-4.438a3.42 3.42 0 00.806-1.946a3.42 3.42 0 013.138-3.138z" />
                 </svg>
                 <span className="text-sm font-semibold">Kepala Unit</span>
               </div>
@@ -162,10 +168,11 @@ export default function KepalaUnitDashboard() {
           </div>
         </div>
 
+        {/* PEMISAH VISUAL 1 */}
+        <hr class="my-12 h-1 bg-gradient-to-r from-transparent via-gray-500 to-transparent border-0" />
 
-
-        {/* Section 1: Penilaian - Enhanced */}
-        <section className="mb-10">
+        {/* Section 1: Penilaian Perawat */}
+        <section className="mb-12">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
               <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-2.5 shadow-md">
@@ -188,8 +195,11 @@ export default function KepalaUnitDashboard() {
           </div>
         </section>
 
-        {/* Section 2: Hasil Penilaian - Enhanced */}
-        <section className="mb-10">
+        {/* PEMISAH VISUAL 2 */}
+        <hr class="my-12 h-1 bg-gradient-to-r from-transparent via-gray-500 to-transparent border-0" />
+
+        {/* Section 2: Hasil Penilaian */}
+        <section className="mb-12">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
               <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-2.5 shadow-md">
@@ -212,8 +222,11 @@ export default function KepalaUnitDashboard() {
           </div>
         </section>
 
-        {/* Section 3: Ujian - Enhanced */}
-        <section className="mb-10">
+        {/* PEMISAH VISUAL 3 */}
+        <hr class="my-12 h-1 bg-gradient-to-r from-transparent via-gray-500 to-transparent border-0" />
+
+        {/* Section 3: Manajemen Ujian */}
+        <section className="mb-12">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
               <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-2.5 shadow-md">
@@ -237,8 +250,11 @@ export default function KepalaUnitDashboard() {
           </div>
         </section>
 
-        {/* Section 4: Dokumen Perawat - Enhanced */}
-        <section className="mb-10">
+        {/* PEMISAH VISUAL 4 */}
+        <hr class="my-12 h-1 bg-gradient-to-r from-transparent via-gray-500 to-transparent border-0" />
+
+        {/* Section 4: Dokumen Perawat */}
+        <section className="mb-12">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
               <div className="bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl p-2.5 shadow-md">
@@ -262,7 +278,10 @@ export default function KepalaUnitDashboard() {
           </div>
         </section>
 
-        {/* Section 5: Management & Lainnya - Enhanced */}
+        {/* PEMISAH VISUAL 5 */}
+        <hr class="my-12 h-1 bg-gradient-to-r from-transparent via-gray-500 to-transparent border-0" />
+
+        {/* Section 5: Management & Lainnya */}
         <section className="mb-6">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">

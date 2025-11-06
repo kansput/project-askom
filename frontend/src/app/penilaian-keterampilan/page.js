@@ -13,6 +13,8 @@ export default function PenilaianPage() {
     const [prosedur, setProsedur] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' });
+    const [keteranganUmum, setKeteranganUmum] = useState("");
+
 
     const [penilaian, setPenilaian] = useState([
         { no: "1.1", komponen: "Menilai kembali kebutuhan perawatan pasien", bobot: 1, nilai: 0, keterangan: "" },
@@ -132,7 +134,8 @@ export default function PenilaianPage() {
                 total_nilai: totalBobotNilai,
                 nilai_akhir: parseFloat(nilaiAkhir),
                 grade: gradeInfo.grade,
-                status: 'selesai'
+                status: 'selesai',
+                keterangan_umum: keteranganUmum,
             };
 
             console.log("Data yang dikirim:", dataToSubmit);
@@ -519,6 +522,21 @@ export default function PenilaianPage() {
                         </div>
                     </div>
                 </div>
+
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                        <div className="w-2 h-6 bg-gray-500 rounded mr-3"></div>
+                        Keterangan Umum
+                    </h3>
+                    <textarea
+                        value={keteranganUmum}
+                        onChange={(e) => setKeteranganUmum(e.target.value)}
+                        placeholder="Catatan keseluruhan hasil penilaian..."
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 resize-none"
+                        rows="4"
+                    />
+                </div>
+
 
                 {/* Submit Section */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

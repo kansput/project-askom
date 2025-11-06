@@ -3,110 +3,96 @@ import User from "../models/userModel.js";
 import { Op } from "sequelize";
 
 export const createOrUpdatePenilaian = async (req, res) => {
-    try {
-        const {
-            perawat_npk,
-            tanggal_penilaian,
-            prosedur,
-            nilai_komponen,
-            total_bobot,
-            total_nilai,
-            nilai_akhir,
-            grade,
-            status
-        } = req.body;
+  try {
+    const {
+      perawat_npk,
+      tanggal_penilaian,
+      prosedur,
+      nilai_komponen,
+      total_bobot,
+      total_nilai,
+      nilai_akhir,
+      grade,
+      status,
+      keterangan_umum // 👈 TAMBAHAN
+    } = req.body;
 
-        const currentUserNpk = req.user.npk;
+    const currentUserNpk = req.user.npk;
 
-        // Validasi data required
-        if (!perawat_npk || !tanggal_penilaian || !prosedur || !nilai_komponen) {
-            return res.status(400).json({
-                success: false,
-                message: "NPK perawat, tanggal penilaian, prosedur, dan komponen penilaian harus diisi"
-            });
-        }
-
-        // Cek apakah perawat exists
-        const perawat = await User.findOne({ where: { npk: perawat_npk, role: 'perawat' } });
-        if (!perawat) {
-            return res.status(404).json({
-                success: false,
-                message: "Perawat tidak ditemukan"
-            });
-        }
-
-        // Cek apakah sudah ada penilaian dengan kombinasi yang sama
-        const existingPenilaian = await PenilaianKeterampilan.findOne({
-            where: {
-                perawat_npk,
-                tanggal_penilaian,
-                prosedur
-            }
-        });
-
-        let result;
-
-        if (existingPenilaian) {
-            // Update existing
-            const updateData = {
-                nilai_komponen: JSON.stringify(nilai_komponen),
-                penilai_npk: currentUserNpk
-            };
-
-            // Hanya update field yang dikirim
-            if (total_bobot !== undefined) updateData.total_bobot = total_bobot;
-            if (total_nilai !== undefined) updateData.total_nilai = total_nilai;
-            if (nilai_akhir !== undefined) updateData.nilai_akhir = nilai_akhir;
-            if (grade !== undefined) updateData.grade = grade;
-            if (status !== undefined) updateData.status = status;
-
-            result = await existingPenilaian.update(updateData);
-        } else {
-            // Create new
-            result = await PenilaianKeterampilan.create({
-                perawat_npk,
-                tanggal_penilaian,
-                prosedur,
-                penilai_npk: currentUserNpk,
-                nilai_komponen: JSON.stringify(nilai_komponen),
-                total_bobot: total_bobot || 0,
-                total_nilai: total_nilai || 0,
-                nilai_akhir: nilai_akhir || 0,
-                grade: grade || 'D',
-                status: status || 'draft'
-            });
-        }
-
-        // Reload dengan data terkait
-        const updatedPenilaian = await PenilaianKeterampilan.findByPk(result.id, {
-            // Di semua bagian yang ada include, ganti alias:
-            include: [
-                { model: User, as: 'perawatKeterampilan', attributes: ['npk', 'username', 'unit'] },
-                { model: User, as: 'penilaiKeterampilan', attributes: ['npk', 'username'] }
-            ]
-        });
-
-        // Parse nilai_komponen kembali ke JSON
-        const responseData = {
-            ...updatedPenilaian.toJSON(),
-            nilai_komponen: JSON.parse(updatedPenilaian.nilai_komponen)
-        };
-
-        res.json({
-            success: true,
-            message: existingPenilaian ? "Penilaian berhasil diupdate" : "Penilaian berhasil dibuat",
-            data: responseData
-        });
-
-    } catch (error) {
-        console.error("Error create/update penilaian:", error);
-        res.status(500).json({
-            success: false,
-            message: "Internal server error",
-            error: error.message
-        });
+    if (!perawat_npk || !tanggal_penilaian || !prosedur || !nilai_komponen) {
+      return res.status(400).json({
+        success: false,
+        message: "NPK perawat, tanggal penilaian, prosedur, dan komponen penilaian harus diisi"
+      });
     }
+
+    const perawat = await User.findOne({ where: { npk: perawat_npk, role: 'perawat' } });
+    if (!perawat) {
+      return res.status(404).json({ success: false, message: "Perawat tidak ditemukan" });
+    }
+
+    const existingPenilaian = await PenilaianKeterampilan.findOne({
+      where: { perawat_npk, tanggal_penilaian, prosedur }
+    });
+
+    let result;
+
+    if (existingPenilaian) {
+      const updateData = {
+        nilai_komponen: JSON.stringify(nilai_komponen),
+        penilai_npk: currentUserNpk
+      };
+
+      if (total_bobot !== undefined) updateData.total_bobot = total_bobot;
+      if (total_nilai !== undefined) updateData.total_nilai = total_nilai;
+      if (nilai_akhir !== undefined) updateData.nilai_akhir = nilai_akhir;
+      if (grade !== undefined) updateData.grade = grade;
+      if (status !== undefined) updateData.status = status;
+      if (keterangan_umum !== undefined) updateData.keterangan_umum = keterangan_umum; // 👈 TAMBAHAN
+
+      result = await existingPenilaian.update(updateData);
+    } else {
+      result = await PenilaianKeterampilan.create({
+        perawat_npk,
+        tanggal_penilaian,
+        prosedur,
+        penilai_npk: currentUserNpk,
+        nilai_komponen: JSON.stringify(nilai_komponen),
+        total_bobot: total_bobot || 0,
+        total_nilai: total_nilai || 0,
+        nilai_akhir: nilai_akhir || 0,
+        grade: grade || 'D',
+        status: status || 'draft',
+        keterangan_umum: keterangan_umum || null // 👈 TAMBAHAN
+      });
+    }
+
+    const updatedPenilaian = await PenilaianKeterampilan.findByPk(result.id, {
+      include: [
+        // (opsional) sesuaikan alias dengan yang ada di model kamu
+        { model: User, as: 'perawat', attributes: ['npk', 'username', 'unit'] },
+        { model: User, as: 'penilai', attributes: ['npk', 'username'] }
+      ]
+    });
+
+    const responseData = {
+      ...updatedPenilaian.toJSON(),
+      nilai_komponen: JSON.parse(updatedPenilaian.nilai_komponen)
+    };
+
+    res.json({
+      success: true,
+      message: existingPenilaian ? "Penilaian berhasil diupdate" : "Penilaian berhasil dibuat",
+      data: responseData
+    });
+
+  } catch (error) {
+    console.error("Error create/update penilaian:", error);
+    res.status(500).json({ success: false, message: "Internal server error", error: error.message });
+  }
 };
+
+
 
 export const getPenilaian = async (req, res) => {
     try {

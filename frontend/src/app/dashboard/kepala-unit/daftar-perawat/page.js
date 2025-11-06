@@ -723,20 +723,7 @@ export default function DaftarPerawatPage() {
           {isKepalaUnit && (
             <button
               onClick={() => setShowAddDialog(true)}
-              className="
-          relative px-5 py-2.5 
-          bg-gradient-to-r from-cyan-500 to-blue-600 
-          text-white font-semibold text-sm 
-          rounded-lg 
-          shadow-lg hover:shadow-cyan-500/30 
-          border border-cyan-400/50 
-          overflow-hidden 
-          group 
-          transition-all duration-300 
-          hover:scale-105 
-          flex items-center gap-2
-        "
-            >
+              className=" relative px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold text-sm rounded-lg shadow-lg hover:shadow-cyan-500/30 border border-cyan-400/50 overflow-hidden group transition-all duration-300 hover:scale-105 flex items-center gap-2 " >
               {/* Efek Glow Background */}
               <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></span>
 

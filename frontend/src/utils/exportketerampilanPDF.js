@@ -3,7 +3,6 @@ export const handleExportPDF = async (item) => {
         const { jsPDF } = await import("jspdf");
         const { autoTable } = await import("jspdf-autotable");
 
-        // === HELPER FUNCTIONS ===
         const formatDate = (dateString) => {
             if (!dateString) return "-";
             const date = new Date(dateString);
@@ -51,14 +50,12 @@ export const handleExportPDF = async (item) => {
         // === HEADER ===
         const addHeader = () => {
             doc.addImage(logoImg, "PNG", margin, 10, 40, 30);
-
             doc.setFontSize(13);
             doc.setFont("helvetica", "bold");
             doc.setTextColor(...primaryColor);
             const title = "LAPORAN EVALUASI KETERAMPILAN / PROSEDUR TINDAKAN KEPERAWATAN";
             const splitTitle = doc.splitTextToSize(title, pageWidth - margin * 2);
             doc.text(splitTitle, pageWidth / 2, 45, { align: "center" });
-
             doc.setFontSize(10);
             doc.setFont("helvetica", "italic");
             doc.setTextColor(80, 80, 80);
@@ -92,7 +89,6 @@ export const handleExportPDF = async (item) => {
             doc.setFontSize(8);
             doc.setTextColor(...grayColor);
             doc.setFont("helvetica", "italic");
-
             doc.text(
                 "Dokumen ini dihasilkan secara otomatis oleh Sistem Re-Kredensial Keperawatan",
                 margin,
@@ -152,46 +148,23 @@ export const handleExportPDF = async (item) => {
             nilaiKomponen = [];
         }
 
-        const getNilai = (noKomponen) => {
-            const komponen = nilaiKomponen.find(k => k.no === noKomponen || k.nomor === noKomponen);
-            return komponen?.nilai || komponen?.score || "-";
-        };
+        // === HITUNG LEBAR TABEL (DIPERBAIKI) ===
+        const columnWidths = [12, 70, 15, 12, 22, 44];
+        const tableWidth = columnWidths.reduce((a, b) => a + b, 0);
+        const tableStartX = (pageWidth - tableWidth) / 2;
 
-        const hitungBobotXNilai = (bobot, nilai) => {
-            if (nilai === "-" || isNaN(nilai)) return "-";
-            return (parseFloat(bobot) * parseFloat(nilai)).toFixed(2);
-        };
-
-        const komponenPenilaian = [
-            ["1.1", "Menilai kembali kebutuhan perawatan pasien", "1", getNilai("1.1"), hitungBobotXNilai("1", getNilai("1.1"))],
-            ["2.1", "Menetapkan cara pelaksanaan tindakan", "1", getNilai("2.1"), hitungBobotXNilai("1", getNilai("2.1"))],
-            ["3.1", "Menyiapkan alat sesuai tindakan", "1", getNilai("3.1"), hitungBobotXNilai("1", getNilai("3.1"))],
-            ["3.2", "Menjelaskan tujuan dan alasan:\n• Menyiapkan lingkungan yang memadai\n• Melakukan prosedur perawatan sesuai langkah & teknik\n• Mencegah komplikasi akibat prosedur\n• Melakukan perawatan dengan lembut", "10", getNilai("3.2"), hitungBobotXNilai("10", getNilai("3.2"))],
-            ["3.3", "Mengumpulkan alat & kembalikan", "1", getNilai("3.3"), hitungBobotXNilai("1", getNilai("3.3"))],
-            ["4.1", "Mengobservasi reaksi pasien", "1", getNilai("4.1"), hitungBobotXNilai("1", getNilai("4.1"))],
-            ["4.2", "Melakukan komunikasi selama tindakan", "1", getNilai("4.2"), hitungBobotXNilai("1", getNilai("4.2"))],
-        ];
-
-        // === FUNGSI AUTO-TABLE CENTER ===
-        const centeredTable = (doc, options = {}) => {
-            const tableWidth = 12 + 95 + 15 + 15 + 20;
-            const startX = (pageWidth - tableWidth) / 2;
-            return autoTable(doc, {
-                ...options,
-                margin: { left: startX, right: startX },
-            });
-        };
-
-        // === TABEL PENILAIAN ===
-        centeredTable(doc, {
+        // === TABEL PENILAIAN (DIPERLEBAR & DITINGGIKAN) ===
+        autoTable(doc, {
             startY: startY + lineHeight * 3 + 8,
-            head: [["No", "Komponen Penilaian", "Bobot", "Nilai", "Bobot × Nilai"]],
-            body: komponenPenilaian.map(r => [
-                r[0],
-                r[1].replace(/\n/g, " "),
-                r[2],
-                r[3],
-                r[4]
+            margin: { left: tableStartX, right: margin },
+            head: [["No", "Komponen Penilaian", "Bobot", "Nilai", "Bobot × Nilai", "Keterangan"]],
+            body: nilaiKomponen.map(k => [
+                k.no,
+                k.komponen.replace(/\n/g, " "), // Hapus \n, biar wrap otomatis
+                k.bobot,
+                k.nilai,
+                (parseFloat(k.bobot) * parseFloat(k.nilai || 0)).toFixed(2),
+                k.keterangan || "-"
             ]),
             theme: "grid",
             styles: {
@@ -199,7 +172,9 @@ export const handleExportPDF = async (item) => {
                 cellPadding: 3,
                 lineColor: [200, 200, 200],
                 lineWidth: 0.2,
-                minCellHeight: 8,
+                minCellHeight: 12,           // DIPERBAIKI: Lebih tinggi
+                overflow: 'linebreak',       // Word wrap otomatis
+                valign: 'top',
             },
             headStyles: {
                 fillColor: primaryColor,
@@ -207,33 +182,34 @@ export const handleExportPDF = async (item) => {
                 fontStyle: "bold",
                 halign: "center",
             },
-            bodyStyles: { valign: "middle" },
+            bodyStyles: { valign: "top" },
             columnStyles: {
                 0: { cellWidth: 12, halign: "center" },
-                1: { cellWidth: 95, valign: "top" },
+                1: { cellWidth: 70, valign: "top" },   // DIPERLEBAR
                 2: { cellWidth: 15, halign: "center" },
                 3: { cellWidth: 15, halign: "center" },
                 4: { cellWidth: 20, halign: "center" },
+                5: { cellWidth: 44, valign: "top" },
             },
             alternateRowStyles: { fillColor: [248, 250, 252] },
         });
 
         // === BAGIAN NILAI DAN KETERANGAN ===
-        const bottomY = doc.lastAutoTable.finalY + 10;
+        const bottomY = doc.lastAutoTable.finalY + 8;
+        const rightX = pageWidth - margin;
 
         doc.setFontSize(9);
         doc.setFont("helvetica", "bold");
         doc.text("Keterangan Nilai:", margin, bottomY);
-
         doc.setFont("helvetica", "normal");
+
         const ketY = bottomY + 4;
         const ls = 4;
-        doc.text("4 = Baik sekali", margin, ketY);
+        doc.text("4 = Baik Sekali", margin, ketY);
         doc.text("3 = Baik", margin, ketY + ls);
         doc.text("2 = Cukup", margin, ketY + ls * 2);
         doc.text("1 = Kurang", margin, ketY + ls * 3);
 
-        const rightX = pageWidth - margin;
         const nilaiAkhir = parseFloat(item.nilai_akhir || 0).toFixed(2);
         const grade = item.grade || calculateGrade(parseFloat(item.nilai_akhir));
         const statusText = getStatusText(item.status);
@@ -242,33 +218,30 @@ export const handleExportPDF = async (item) => {
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(...primaryColor);
-
         doc.text(`Nilai Akhir/16 : ${nilaiAkhir}`, rightX, bottomY, { align: "right" });
         doc.text(`Grade          : ${grade}`, rightX, bottomY + rs, { align: "right" });
         doc.text(`Status Kelulusan : ${statusText}`, rightX, bottomY + rs * 2, { align: "right" });
 
         // === TANDA TANGAN ===
-        const signY = Math.max(ketY + ls * 3, bottomY + rs * 2) + 15;
-        const nameY = signY + 20;
+        const signY = Math.max(ketY + ls * 3, bottomY + rs * 2) + 10;
+        const nameY = signY + 18;
 
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(40, 40, 40);
-
         doc.text("Penguji,", margin, signY);
         doc.text(`( ${item.penilaiKeterampilan?.username || ".............................."} )`, margin, nameY);
-
         doc.text("Kepala Unit,", rightX, signY, { align: "right" });
         doc.text("( .............................. )", rightX, nameY, { align: "right" });
 
-        // === FOOTER PER HALAMAN ===
+        // === TAMBAHKAN FOOTER KE SEMUA HALAMAN ===
         const totalPages = doc.getNumberOfPages();
         for (let i = 1; i <= totalPages; i++) {
             doc.setPage(i);
             addFooter();
         }
 
-        // === OUTPUT ===
+        // === OUTPUT PDF ===
         const pdfUrl = doc.output("bloburl");
         window.open(pdfUrl, "_blank");
     } catch (err) {

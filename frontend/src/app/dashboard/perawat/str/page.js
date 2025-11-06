@@ -86,10 +86,12 @@ export default function StrSipPage() {
       console.log("Upload result:", data);
 
       if (data.success) {
-        toast.success("Data berhasil diupload ke backend!");
+        toast.success("Data berhasil dikirim dan disimpan!");
         setFormData({});
         setFiles({});
         e.target.reset();
+
+        
       } else {
         toast.error("Upload gagal: " + data.message);
       }

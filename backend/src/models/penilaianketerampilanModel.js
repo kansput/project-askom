@@ -1,3 +1,4 @@
+// models/penilaianketerampilanModel.js
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 import User from "./userModel.js";
@@ -33,7 +34,7 @@ const PenilaianKeterampilan = sequelize.define("PenilaianKeterampilan", {
     }
   },
   nilai_komponen: {
-    type: DataTypes.TEXT, // JSON string untuk menyimpan array komponen penilaian
+    type: DataTypes.TEXT,
     allowNull: false,
   },
   total_bobot: {
@@ -55,13 +56,18 @@ const PenilaianKeterampilan = sequelize.define("PenilaianKeterampilan", {
   status: {
     type: DataTypes.ENUM('draft', 'selesai', 'final'),
     defaultValue: 'draft',
+  },
+  
+  keterangan_umum: {
+    type: DataTypes.TEXT,
+    allowNull: true,
   }
+
 }, {
   tableName: "penilaian_keterampilan",
   timestamps: true,
 });
 
-// Associations
 PenilaianKeterampilan.belongsTo(User, {
   foreignKey: 'perawat_npk',
   targetKey: 'npk',
