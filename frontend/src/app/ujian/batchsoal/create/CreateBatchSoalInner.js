@@ -113,8 +113,9 @@ export default function CreateBatchSoalPage() {
 
         const newSoal = {
             pertanyaan,
-            gambar: gambarPreview,   // buat preview di UI
-            gambarFile,              // file asli, buat dikirim ke backend
+            gambar: gambarPreview,   
+            gambarFile, 
+            gambarPreview: gambarPreview,             
             opsi,
             jawabanBenar,
         };
@@ -343,7 +344,7 @@ export default function CreateBatchSoalPage() {
                                             height={192}
                                             className="max-w-xs max-h-48 rounded-lg border-2 border-slate-200 shadow-sm"
                                             style={{ objectFit: "contain" }}
-                                            onClick={() => setZoomImage(s.gambarPreview)}
+                                            onClick={() => setZoomImage(gambarPreview)}
                                         />
                                         <button
                                             onClick={handleRemoveImage}
