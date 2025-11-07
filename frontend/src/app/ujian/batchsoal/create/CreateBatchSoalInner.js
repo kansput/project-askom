@@ -2,11 +2,12 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from 'next/link';
+import NextImage from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { BookOpen, Plus, Save, Image, CheckCircle, Trash2, AlertCircle } from "lucide-react";
 import { toast } from "react-hot-toast";
-import NextImage from "next/image";
+
 
 export default function CreateBatchSoalPage() {
     const [nama, setNama] = useState("");
@@ -15,6 +16,7 @@ export default function CreateBatchSoalPage() {
     const [gambar, setGambar] = useState("");
     const [gambarFile, setGambarFile] = useState(null);
     const [gambarPreview, setGambarPreview] = useState("");
+    const [zoomImage, setZoomImage] = useState(null);
     const [opsi, setOpsi] = useState([
         { kode: "A", text: "" },
         { kode: "B", text: "" },
@@ -24,7 +26,12 @@ export default function CreateBatchSoalPage() {
     const [jawabanBenar, setJawabanBenar] = useState("A");
     const [listSoal, setListSoal] = useState([]);
 
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : "";
+    const [token, setToken] = useState("");
+
+    useEffect(() => {
+        setToken(localStorage.getItem("token") || "");
+    }, []);
+
     const searchParams = useSearchParams();
     const editId = searchParams.get("edit");
 
@@ -37,11 +44,15 @@ export default function CreateBatchSoalPage() {
 
     useEffect(() => {
         const fetchDetail = async () => {
+            if (!token) return;
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/batchsoal/${editId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const data = await res.json();
+                console.log("DEBUG - Response Backend untuk Edit:", data); // <-- Tambah ini
+                console.log("DEBUG - Soals Gambar:", data.data.soals.map(s => ({ id: s.id, gambar: s.gambar }))); // <-- Lihat gambar path
+
                 if (data.success) {
                     setNama(data.data.nama);
                     setDeskripsi(data.data.deskripsi || "");
@@ -50,17 +61,16 @@ export default function CreateBatchSoalPage() {
                             id: s.id,
                             pertanyaan: s.pertanyaan,
                             gambar: s.gambar,
-                            opsi: s.opsi.map((str) => {
-                                const [kode, ...rest] = str.split(".");
-                                return { kode: kode.trim(), text: rest.join(".").trim() };
-                            }),
+                            // TAMBAHKAN BARIS INI (INI YANG HILANG!)
+                            gambarPreview: s.gambar ? `${process.env.NEXT_PUBLIC_API_URL}${s.gambar}` : null,
+                            gambarFile: null,
+                            opsi: s.opsi,
                             jawabanBenar: s.jawabanBenar,
                         }))
                     );
-
                 }
             } catch (err) {
-                console.error(" Gagal fetch batch detail:", err);
+                console.error("Gagal fetch batch detail:", err);
             }
         };
         if (editId && token) fetchDetail();
@@ -333,6 +343,7 @@ export default function CreateBatchSoalPage() {
                                             height={192}
                                             className="max-w-xs max-h-48 rounded-lg border-2 border-slate-200 shadow-sm"
                                             style={{ objectFit: "contain" }}
+                                            onClick={() => setZoomImage(s.gambarPreview)}
                                         />
                                         <button
                                             onClick={handleRemoveImage}
@@ -418,19 +429,22 @@ export default function CreateBatchSoalPage() {
                                             </div>
                                             <div className="flex-1">
                                                 <p className="font-semibold text-slate-800 leading-relaxed">{s.pertanyaan}</p>
-                                                {s.gambar && (
+                                                {s.gambarPreview ? (
                                                     <div className="mt-3">
                                                         <NextImage
-                                                            src={s.gambar.startsWith("data:")
-                                                                ? s.gambar                   // kalau base64 → pakai langsung
-                                                                : `${process.env.NEXT_PUBLIC_API_URL}${s.gambar}`}  // kalau path dari backend
+                                                            src={s.gambarPreview}
                                                             alt="Gambar soal"
                                                             width={320}
                                                             height={160}
                                                             className="max-w-sm max-h-40 rounded-lg border-2 border-slate-200 shadow-sm"
                                                             style={{ objectFit: "contain" }}
+                                                            unoptimized
+                                                            onError={(e) => console.error("DEBUG - Gambar Gagal Load:", s.gambarPreview, e)}
+                                                            onClick={() => setZoomImage(s.gambarPreview)} // Tambah ini untuk log error load
                                                         />
                                                     </div>
+                                                ) : (
+                                                    <p className="text-red-500 mt-3">Tidak ada gambar (DEBUG: Cek DB atau backend)</p>
                                                 )}
                                             </div>
                                         </div>
@@ -502,6 +516,54 @@ export default function CreateBatchSoalPage() {
                     </button>
                 </div>
             </main>
+
+            {zoomImage && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 p-4"
+                    onClick={() => setZoomImage(null)}
+                >
+                    <div className="relative max-w-4xl w-full">
+                        {/* Tombol Close */}
+                        <button
+                            onClick={() => setZoomImage(null)}
+                            className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        {/* GUNAKAN NextImage + unoptimized + ref */}
+                        <div className="overflow-hidden rounded-lg shadow-2xl">
+                            <NextImage
+                                src={zoomImage}
+                                alt="Zoom"
+                                width={1200}
+                                height={800}
+                                className="w-full h-auto max-h-screen object-contain cursor-zoom-in transition-transform duration-200"
+                                style={{ transform: "scale(1)" }}
+                                unoptimized // MATIKAN OPTIMASI → BISA ZOOM!
+                                onClick={(e) => e.stopPropagation()}
+                                // Gunakan ref + useEffect untuk wheel zoom
+                                ref={(el) => {
+                                    if (el) {
+                                        el.style.transform = "scale(1)";
+                                        const handleWheel = (e) => {
+                                            e.preventDefault();
+                                            const scale = parseFloat(el.style.transform.replace("scale(", "").replace(")", "")) || 1;
+                                            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                                            const newScale = Math.min(Math.max(0.5, scale + delta), 3);
+                                            el.style.transform = `scale(${newScale})`;
+                                        };
+                                        el.addEventListener("wheel", handleWheel);
+                                        return () => el.removeEventListener("wheel", handleWheel);
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
             <Footer />
         </div>
     );

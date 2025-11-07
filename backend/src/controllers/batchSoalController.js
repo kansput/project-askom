@@ -99,7 +99,7 @@ export const addSoalToBatch = async (req, res) => {
       pertanyaan,
       gambar: gambarPath,
       jawabanBenar,
-      opsi: formattedOpsi, k
+      opsi: formattedOpsi 
     });
 
     return res.json({

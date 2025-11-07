@@ -169,7 +169,7 @@ export default function KepalaUnitDashboard() {
         </div>
 
         {/* PEMISAH VISUAL 1 */}
-        <hr class="my-12 h-1 bg-gradient-to-r from-transparent via-gray-500 to-transparent border-0" />
+        
 
         {/* Section 1: Penilaian Perawat */}
         <section className="mb-12">
@@ -196,7 +196,7 @@ export default function KepalaUnitDashboard() {
         </section>
 
         {/* PEMISAH VISUAL 2 */}
-        <hr class="my-12 h-1 bg-gradient-to-r from-transparent via-gray-500 to-transparent border-0" />
+        
 
         {/* Section 2: Hasil Penilaian */}
         <section className="mb-12">
@@ -223,7 +223,7 @@ export default function KepalaUnitDashboard() {
         </section>
 
         {/* PEMISAH VISUAL 3 */}
-        <hr class="my-12 h-1 bg-gradient-to-r from-transparent via-gray-500 to-transparent border-0" />
+        
 
         {/* Section 3: Manajemen Ujian */}
         <section className="mb-12">
@@ -251,7 +251,7 @@ export default function KepalaUnitDashboard() {
         </section>
 
         {/* PEMISAH VISUAL 4 */}
-        <hr class="my-12 h-1 bg-gradient-to-r from-transparent via-gray-500 to-transparent border-0" />
+        
 
         {/* Section 4: Dokumen Perawat */}
         <section className="mb-12">
@@ -279,7 +279,7 @@ export default function KepalaUnitDashboard() {
         </section>
 
         {/* PEMISAH VISUAL 5 */}
-        <hr class="my-12 h-1 bg-gradient-to-r from-transparent via-gray-500 to-transparent border-0" />
+        
 
         {/* Section 5: Management & Lainnya */}
         <section className="mb-6">

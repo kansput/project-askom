@@ -118,10 +118,9 @@ export default function DetailBatchSoalPage() {
                 </div>
 
                 <div className="ml-12 space-y-2">
-                  {s.opsi?.map((str) => {
-                    const [kode, ...rest] = str.split(".");
-                    const kodeTrim = kode.trim();
-                    const textTrim = rest.join(".").trim();
+                  {s.opsi?.map((opt) => {
+                    const kodeTrim = opt.kode;
+                    const textTrim = opt.text;
 
                     return (
                       <div
