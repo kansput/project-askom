@@ -429,22 +429,20 @@ export default function CreateBatchSoalPage() {
                                             </div>
                                             <div className="flex-1">
                                                 <p className="font-semibold text-slate-800 leading-relaxed">{s.pertanyaan}</p>
-                                                {s.gambarPreview ? (
+                                                {s.gambarPreview && (
                                                     <div className="mt-3">
                                                         <NextImage
                                                             src={s.gambarPreview}
                                                             alt="Gambar soal"
                                                             width={320}
                                                             height={160}
-                                                            className="max-w-sm max-h-40 rounded-lg border-2 border-slate-200 shadow-sm"
+                                                            className="max-w-sm max-h-40 rounded-lg border-2 border-slate-200 shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
                                                             style={{ objectFit: "contain" }}
                                                             unoptimized
-                                                            onError={(e) => console.error("DEBUG - Gambar Gagal Load:", s.gambarPreview, e)}
-                                                            onClick={() => setZoomImage(s.gambarPreview)} // Tambah ini untuk log error load
+                                                            onClick={() => setZoomImage(s.gambarPreview)}
+                                                            onError={() => console.warn("Gambar gagal load:", s.gambarPreview)}
                                                         />
                                                     </div>
-                                                ) : (
-                                                    <p className="text-red-500 mt-3">Tidak ada gambar (DEBUG: Cek DB atau backend)</p>
                                                 )}
                                             </div>
                                         </div>
