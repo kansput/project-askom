@@ -11,9 +11,14 @@ import fs from "fs";
 const makePublicPath = (filePath) => {
     if (!filePath) return null;
     const normalized = filePath.replace(/\\/g, "/");
-    const relative = normalized.split("src/")[1]; // hasil: "uploads/kredokumen/12/file.pdf"
-    return relative;
+    const uploadsIndex = normalized.indexOf("uploads/");
+    if (uploadsIndex !== -1) {
+        // hasil: "kredokumen/1/fileSPKK-....pdf"
+        return normalized.substring(uploadsIndex + "uploads/".length);
+    }
+    return normalized;
 };
+
 
 // Hapus file fisik dengan aman
 const deleteFile = (relativePath) => {

@@ -64,6 +64,9 @@ console.log("Serving static files from:", uploadsPath);
 
 app.use("/uploads", express.static(uploadsPath));
 
+const kredokumenPath = path.join(uploadsPath, "kredokumen");
+app.use("/kredokumen", express.static(kredokumenPath));
+
 // Buat folder uploads jika belum ada
 if (!fs.existsSync(uploadsPath)) {
   fs.mkdirSync(uploadsPath, { recursive: true });
