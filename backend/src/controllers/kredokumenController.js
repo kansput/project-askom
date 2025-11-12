@@ -33,7 +33,7 @@ const deleteFile = (relativePath) => {
 };
 
 // Base URL (fallback ke localhost)
-const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 // ============================================================================
 // 📦 CREATE (UPLOAD DOKUMEN)
