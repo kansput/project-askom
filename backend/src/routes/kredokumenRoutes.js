@@ -7,10 +7,10 @@ import {
   deleteKredoDokumen,
 } from "../controllers/kredokumenController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
-import { 
-  checkKredoOwnership, 
-  authorizeKredoRoles, 
-  validateKredoUpload 
+import {
+  checkKredoOwnership,
+  authorizeKredoRoles,
+  validateKredoUpload
 } from "../middlewares/kredokumenMiddleware.js";
 import multer from "multer";
 import path from "path";
@@ -22,15 +22,15 @@ const storage = multer.diskStorage({
     const userId = req.user.id;
     //  PERBAIKAN: Sesuaikan dengan struktur folder backend/src/uploads
     const uploadPath = path.join(process.cwd(), "src", "uploads", "kredokumen", userId.toString());
-    
+
     console.log(" Creating upload directory:", uploadPath);
-    
+
     // Buat folder jika belum ada
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
       console.log(" Upload directory created");
     }
-    
+
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
@@ -38,24 +38,35 @@ const storage = multer.diskStorage({
     const ext = path.extname(file.originalname);
     const fieldName = file.fieldname;
     const filename = fieldName + "-" + uniqueSuffix + ext;
-    
+
     console.log("📄 Saving file:", filename);
     cb(null, filename);
   },
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowedExtensions = [".xls", ".xlsx"];
+  const allowedExtensions = [".pdf", ".doc", ".docx", ".xls", ".xlsx"];
+  const allowedMimeTypes = [
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  ];
+
   const ext = path.extname(file.originalname).toLowerCase();
-  
-  console.log("🔍 Checking file:", file.originalname, "Type:", file.mimetype, "Extension:", ext);
-  
-  if (allowedExtensions.includes(ext)) {
+  const mime = file.mimetype;
+
+  console.log("🔍 Checking file:", file.originalname, "Type:", mime, "Extension:", ext);
+
+  if (allowedExtensions.includes(ext) && allowedMimeTypes.includes(mime)) {
+    console.log(`✅ File ${file.originalname} diterima dan lolos validasi.`);
     cb(null, true);
   } else {
-    cb(new Error("Format file tidak didukung. Harap upload file XLS atau XLSX."), false);
+    cb(new Error("Format file tidak didukung. Gunakan PDF, DOC, DOCX, XLS, atau XLSX."), false);
   }
 };
+
 
 const upload = multer({
   storage: storage,

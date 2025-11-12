@@ -29,63 +29,57 @@ export default function DokumenPage() {
 
   const handleDrop = (e, target) => {
     e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    setDragTarget(null);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      const validMimeTypes = [
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      ];
-      const validExtensions = ['.xls', '.xlsx'];
-      const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
 
-      // Validate MIME type and file extension
-      if (!validMimeTypes.includes(file.type) || !validExtensions.includes(fileExtension)) {
-        toast.error('Format file tidak didukung. Harap upload file XLS atau XLSX.');
-        return;
-      }
-      // Validate file size (10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error('Ukuran file terlalu besar. Maksimal 10MB.');
-        return;
-      }
-      setFiles(prev => ({
-        ...prev,
-        [target]: file
-      }));
-      toast.success(`${target === 'kredensial' ? 'Kredensial' : 'SPKK'} berhasil diupload!`);
+    const fileName = file.name.toLowerCase();
+    const fileExtension = fileName.substring(fileName.lastIndexOf('.'));
+    const validExtensions = ['.pdf', '.doc', '.docx', '.xls', '.xlsx'];
+
+    if (!validExtensions.includes(fileExtension)) {
+      toast.error('Format file tidak didukung. Gunakan PDF, DOC, DOCX, XLS, atau XLSX.');
+      return;
     }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Ukuran file terlalu besar. Maksimal 10MB.');
+      return;
+    }
+
+    // Inisialisasi state files jika masih kosong
+    setFiles((prev) => ({
+      ...((prev || {}) ?? {}),
+      [target]: file,
+    }));
+
+    toast.success(`${target === 'kredensial' ? 'Kredensial' : 'SPKK'} berhasil diupload!`);
   };
+
 
   const handleFileChange = (e, target) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const validMimeTypes = [
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      ];
-      const validExtensions = ['.xls', '.xlsx'];
-      const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+      const fileName = file.name.toLowerCase();
+      const fileExtension = fileName.substring(fileName.lastIndexOf('.'));
 
-      // Validate MIME type and file extension
-      if (!validMimeTypes.includes(file.type) || !validExtensions.includes(fileExtension)) {
-        toast.error('Format file tidak didukung. Harap upload file XLS atau XLSX.');
+      // Cek ekstensi manual
+      const validExtensions = ['.pdf', '.doc', '.docx', '.xls', '.xlsx'];
+      if (!validExtensions.includes(fileExtension)) {
+        toast.error('Format file tidak didukung. Gunakan PDF, DOC, DOCX, XLS, atau XLSX.');
         return;
       }
-      // Validate file size (10MB)
+
       if (file.size > 10 * 1024 * 1024) {
         toast.error('Ukuran file terlalu besar. Maksimal 10MB.');
         return;
       }
-      setFiles(prev => ({
-        ...prev,
-        [target]: file
-      }));
+
+      setFiles((prev) => ({ ...prev, [target]: file }));
       toast.success(`${target === 'kredensial' ? 'Kredensial' : 'SPKK'} berhasil diupload!`);
     }
   };
+
+
 
   const removeFile = (target) => {
     setFiles(prev => ({
@@ -218,8 +212,8 @@ export default function DokumenPage() {
           </label>
           <input
             type="date"
-            value={tanggal} 
-            onChange={(e) => setTanggal(e.target.value)} 
+            value={tanggal}
+            onChange={(e) => setTanggal(e.target.value)}
             required
             className="border-2 border-gray-300 rounded-lg px-3 py-2 w-full max-w-xs bg-white text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
           />
@@ -258,7 +252,7 @@ export default function DokumenPage() {
                   type="file"
                   onChange={(e) => handleFileChange(e, "kredensial")}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  accept=".xls,.xlsx"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx"
                 />
 
                 <div className="flex flex-col items-center gap-3 pointer-events-none">
@@ -286,7 +280,7 @@ export default function DokumenPage() {
                           Drag & drop atau klik untuk upload
                         </p>
                         <p className="text-xs text-gray-600">
-                          Format: XLS atau XLSX
+                          Format: PDF, DOC/DOCX, atau XLS/XLSX
                         </p>
                       </div>
                     </>
@@ -331,7 +325,7 @@ export default function DokumenPage() {
                   type="file"
                   onChange={(e) => handleFileChange(e, "spkk")}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  accept=".xls,.xlsx"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx"
                 />
 
                 <div className="flex flex-col items-center gap-3 pointer-events-none">
@@ -359,7 +353,7 @@ export default function DokumenPage() {
                           Drag & drop atau klik untuk upload
                         </p>
                         <p className="text-xs text-gray-600">
-                          Format: XLS atau XLSX
+                          Format: PDF, DOC/DOCX, atau XLS/XLSX
                         </p>
                       </div>
                     </>
@@ -416,7 +410,7 @@ export default function DokumenPage() {
               <p className="font-semibold mb-1">Informasi Penting:</p>
               <ul className="list-disc list-inside space-y-0.5 text-gray-600">
                 <li>Pastikan kedua dokumen sudah ditandatangani</li>
-                <li>File harus dalam format Xls atau Xlsx</li>
+                <li>File harus dalam format PDF, DOC/DOCX, atau XLS/XLSX</li>
                 <li>Ukuran file maksimal 10MB per dokumen</li>
                 <li>Kedua dokumen harus diupload sebelum dikirim</li>
               </ul>
