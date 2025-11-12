@@ -6,34 +6,28 @@ import fs from "fs";
 // Helper untuk path upload - PERBAIKI
 const makePublicPath = (filePath) => {
     if (!filePath) return null;
-    
-    // Normalize path separator
+
+    // Pastikan separator aman untuk semua OS
     let normalizedPath = filePath.replace(/\\/g, "/");
-    
-    // Debug: log original path
-    console.log("📁 Original path:", filePath);
-    console.log("📁 Normalized path:", normalizedPath);
-    
-    // Remove the uploads directory part to make it relative to static serving
-    // Sesuaikan dengan struktur folder Anda
-    if (normalizedPath.includes("src/uploads/")) {
-        normalizedPath = normalizedPath.split("src/uploads/")[1];
-    } else if (normalizedPath.includes("uploads/")) {
-        normalizedPath = normalizedPath.split("uploads/")[1];
+
+    // Ambil bagian setelah folder "uploads/"
+    const uploadsIndex = normalizedPath.lastIndexOf("uploads/");
+    if (uploadsIndex !== -1) {
+        normalizedPath = normalizedPath.substring(uploadsIndex + 8); // ambil setelah 'uploads/'
     }
-    
-    console.log("📁 Public path:", normalizedPath);
+
     return normalizedPath;
 };
+
 
 // Helper untuk menghapus file fisik
 const deleteFile = (filePath) => {
     if (!filePath) return;
-    
+
     try {
         // Reconstruct full path
         const fullPath = path.join(process.cwd(), "src", "uploads", filePath);
-        
+
         if (fs.existsSync(fullPath)) {
             fs.unlinkSync(fullPath);
             console.log("File deleted:", fullPath);
@@ -75,7 +69,7 @@ export const uploadKredoDokumen = async (req, res) => {
         console.log("- Original name:", req.files.fileKredensial[0].originalname);
         console.log("- Path:", req.files.fileKredensial[0].path);
         console.log("- Size:", req.files.fileKredensial[0].size);
-        
+
         console.log("📄 File SPKK details:");
         console.log("- Original name:", req.files.fileSPKK[0].originalname);
         console.log("- Path:", req.files.fileSPKK[0].path);
@@ -122,7 +116,7 @@ export const deleteKredoDokumen = async (req, res) => {
 
         // Cari dokumen
         const doc = await KredoDokumen.findByPk(id);
-        
+
         if (!doc) {
             return res.status(404).json({
                 success: false,
@@ -182,10 +176,10 @@ export const getAllKredoDokumen = async (req, res) => {
 
         const result = docs.map((doc) => {
             const d = doc.toJSON();
-            
+
             // Tambahkan full URL untuk file
             const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
-            
+
             return {
                 ...d,
                 npk: d.User?.npk || null,
@@ -235,10 +229,10 @@ export const getKredoDokumenByUser = async (req, res) => {
 
         const result = docs.map((doc) => {
             const d = doc.toJSON();
-            
+
             // Tambahkan full URL untuk file
             const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
-            
+
             return {
                 ...d,
                 npk: d.User?.npk || null,
@@ -293,10 +287,10 @@ export const getKredoDokumenById = async (req, res) => {
         }
 
         const docData = doc.toJSON();
-        
+
         // Tambahkan full URL untuk file
         const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
-        
+
         const result = {
             ...docData,
             npk: docData.User?.npk || null,

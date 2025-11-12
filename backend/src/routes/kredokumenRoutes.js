@@ -51,21 +51,19 @@ const fileFilter = (req, file, cb) => {
     "application/msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     "application/vnd.ms-excel",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
   ];
 
   const ext = path.extname(file.originalname).toLowerCase();
   const mime = file.mimetype;
 
-  console.log("🔍 Checking file:", file.originalname, "Type:", mime, "Extension:", ext);
-
   if (allowedExtensions.includes(ext) && allowedMimeTypes.includes(mime)) {
-    console.log(`✅ File ${file.originalname} diterima dan lolos validasi.`);
     cb(null, true);
   } else {
     cb(new Error("Format file tidak didukung. Gunakan PDF, DOC, DOCX, XLS, atau XLSX."), false);
   }
 };
+
 
 
 const upload = multer({
