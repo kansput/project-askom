@@ -13,7 +13,7 @@ export default function LoginPage() {
       className="flex items-center justify-center min-h-screen bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: "url('/foto RS Carolus landscape 1.jpg')" }}
     >
-      <LoginForm tokenFromAppA={searchParams.get('AccessToken')} />
+      <LoginForm tokenFromAppA={searchParams.get('accessToken')} />
     </div>
   );
 }
