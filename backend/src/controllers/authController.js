@@ -174,8 +174,7 @@ export const handleSSO = async (req, res) => {
       return res.status(400).json({ error: 'Token dari App A diperlukan' });
     }
 
-    // Decode token dari App A untuk dapat NPK
-    const decoded = jwt.decode(tokenFromAppA); // ← PAKAI DECODE, BUKAN VERIFY
+    const decoded = jwt.decode(tokenFromAppA); 
     const npk = decoded.id_pegawai;
 
     // Setelah decode token, tambahkan:

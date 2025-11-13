@@ -6,22 +6,14 @@ import { useEffect } from "react";
 export default function LoginPage() {
   const searchParams = useSearchParams();
 
-  useEffect(() => {
-    // Tangkap token dari URL parameters
-    const tokenFromAppA = searchParams.get('accessToken');
 
-    if (tokenFromAppA) {
-      console.log("Token dari App A:", tokenFromAppA);
-      // Token akan diproses di LoginForm
-    }
-  }, [searchParams]);
 
   return (
     <div
       className="flex items-center justify-center min-h-screen bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: "url('/foto RS Carolus landscape 1.jpg')" }}
     >
-      <LoginForm tokenFromAppA={searchParams.get('token')} />
+      <LoginForm tokenFromAppA={searchParams.get('AccessToken')} />
     </div>
   );
 }
