@@ -23,6 +23,7 @@ import kredokumenRoutes from "./routes/kredokumenRoutes.js";
 import penilaianPresentasiRoutes from "./routes/penilaianpresentasiRoutes.js";
 import penilaianKeterampilanRoutes from "./routes/penilaianketerampilanRoutes.js";
 
+
 // Load environment variables
 dotenv.config();
 
@@ -100,6 +101,7 @@ app.use("/api/sertifikat", sertifikatRoutes);
 app.use("/api/kredokumen", kredokumenRoutes);
 app.use("/api/penilaian", penilaianPresentasiRoutes);
 app.use("/api/penilaian-keterampilan", penilaianKeterampilanRoutes);
+
 
 // ===================================
 // HEALTH CHECK & TEST ENDPOINTS

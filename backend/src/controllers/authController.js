@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 
-// Register (opsional)
+
 export const register = async (req, res) => {
   try {
     const { npk, username, email, password, role } = req.body;
@@ -163,5 +163,61 @@ export const changePassword = async (req, res) => {
   } catch (error) {
     console.error("Change password error:", error);
     res.status(500).json({ success: false, message: "Server error saat ubah password" });
+  }
+};
+
+export const handleSSO = async (req, res) => {
+  try {
+
+    const { token: tokenFromAppA } = req.body; // token dari App A
+    if (!tokenFromAppA) {
+      return res.status(400).json({ error: 'Token dari App A diperlukan' });
+    }
+
+    // Decode token dari App A untuk dapat NPK
+    const decoded = jwt.decode(tokenFromAppA); // ← PAKAI DECODE, BUKAN VERIFY
+    const npk = decoded.id_pegawai;
+
+    // Setelah decode token, tambahkan:
+    const user = await User.findOne({ where: { npk } });
+    if (!user) {
+      return res.status(404).json({ error: 'NPK tidak ditemukan' });
+    }
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        npk: user.npk,
+        role: user.role,
+        unit: user.unit,
+        areaKlinis: user.areaKlinis
+      },
+      process.env.JWT_SECRET || "default_secret",
+      { expiresIn: "1d" }
+    );
+
+
+    user.currentToken = token;
+    await user.save();
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        npk: user.npk,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        unit: user.unit,
+        jenjangKarir: user.jenjangKarir,
+        areaKlinis: user.areaKlinis,
+        mustChangePassword: user.mustChangePassword,
+      },
+    });
+
+    // Lanjut ke generate JWT
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };

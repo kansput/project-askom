@@ -1,10 +1,10 @@
 "use client";
-import { useState } from "react";
+import {  useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { loginUser, getRoleBasedRoute } from "../utils/auth";
 
-// Icon sederhana
+
 const UserIcon = () => (
   <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -49,7 +49,7 @@ const LoadingSpinner = () => (
   </svg>
 );
 
-export default function LoginForm() {
+export default function LoginForm({ tokenFromAppA }) {
   const [npk, setNpk] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -57,6 +57,43 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const handleSSOLogin = async (token) => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/sso`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
+
+          if (data.user.mustChangePassword) {
+            router.push("/change-password");
+          } else {
+            router.push(getRoleBasedRoute(data.user.role));
+          }
+        } else {
+          setError(data.error || "SSO failed");
+        }
+      } catch (error) {
+        setError("SSO Error: " + error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (tokenFromAppA) {
+      handleSSOLogin(tokenFromAppA);
+    }
+  }, [tokenFromAppA, router]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -149,8 +186,8 @@ export default function LoginForm() {
           type="submit"
           disabled={loading}
           className={`w-full py-3 px-4 text-white font-semibold rounded-xl shadow-lg transition-all duration-200 ${loading
-              ? "bg-blue-400 cursor-not-allowed"
-              : "bg-gradient-to-r from-blue-900 to-blue-600 hover:from-blue-700 hover:to-blue-800"
+            ? "bg-blue-400 cursor-not-allowed"
+            : "bg-gradient-to-r from-blue-900 to-blue-600 hover:from-blue-700 hover:to-blue-800"
             }`}
         >
           {loading ? (
