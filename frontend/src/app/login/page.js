@@ -8,7 +8,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     // Tangkap token dari URL parameters
-    const tokenFromAppA = searchParams.get('token');
+    const tokenFromAppA = searchParams.get('accessToken');
 
     if (tokenFromAppA) {
       console.log("Token dari App A:", tokenFromAppA);
