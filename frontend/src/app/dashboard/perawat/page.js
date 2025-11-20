@@ -206,7 +206,7 @@ export default function PerawatDashboard() {
             </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-5">
-            <CardItem image="/starting.png" title="Ujian Askom" href="/dashboard/perawat/askom" />
+            <CardItem image="/starting.png" title="Ujian" href="/dashboard/perawat/ujian" />
           </div>
         </section>
 

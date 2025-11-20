@@ -246,7 +246,7 @@ export default function KepalaUnitDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-5">
             <CardItem image="/starting.png" title="Mulai Ujian" href="/ujian/create" />
             <CardItem image="/books.png" title="Batch Soal Ujian" href="/ujian/batchsoal/" />
-            <CardItem image="/ujian-selesai.png" title="Hasil Ujian" href="/dashboard/kepala-unit/submission" />
+            <CardItem image="/ujian-selesai.png" title="Hasil Ujian" href="/dashboard/kepala-unit/hasil-ujian" />
           </div>
         </section>
 

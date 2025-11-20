@@ -5,7 +5,6 @@ import User from "../models/userModel.js";
 import BatchSoal from "../models/batchSoalModel.js";
 import Soal from "../models/soalModel.js";
 import JawabanOpsi from "../models/jawabanOpsiModel.js";
-
 // ========== CREATE UJIAN ==========
 export const createUjian = async (req, res) => {
   try {
@@ -43,7 +42,6 @@ export const createUjian = async (req, res) => {
     res.status(500).json({ success: false, message: "Gagal membuat ujian" });
   }
 };
-
 // ========== START UJIAN ==========
 export const startUjian = async (req, res) => {
   try {
@@ -74,9 +72,6 @@ export const startUjian = async (req, res) => {
     res.status(500).json({ success: false, message: "Gagal memulai ujian" });
   }
 };
-
-
-
 // ========== GET ALL UJIAN ==========
 export const getAllUjian = async (req, res) => {
   try {
@@ -97,8 +92,6 @@ export const getAllUjian = async (req, res) => {
     res.status(500).json({ success: false, message: "Gagal mengambil daftar ujian" });
   }
 };
-
-
 // ========== DELETE UJIAN ==========
 export const deleteUjian = async (req, res) => {
   try {
@@ -120,7 +113,6 @@ export const deleteUjian = async (req, res) => {
     res.status(500).json({ success: false, message: "Gagal menghapus ujian" });
   }
 };
-
 // ========== GET UJIAN BY ID ==========
 export const getUjianById = async (req, res) => {
   try {
@@ -277,8 +269,6 @@ export const startUjianPeserta = async (req, res) => {
     });
   }
 };
-
-
 // ========== SUBMIT UJIAN ==========
 export const submitUjian = async (req, res) => {
   try {
@@ -340,8 +330,6 @@ export const submitUjian = async (req, res) => {
     res.status(500).json({ success: false, message: "Gagal submit ujian", error: err.message });
   }
 };
-
-
 // ========== GET HASIL UJIAN ==========
 export const getHasilUjian = async (req, res) => {
   try {
@@ -416,6 +404,91 @@ export const getHasilUjian = async (req, res) => {
     });
   }
 };
+export const getActiveUjianForPeserta = async (req, res) => {
+  try {
+    const now = new Date();
+
+    const ujianList = await Ujian.findAll({
+      where: { status: "active" },
+      order: [["waktuMulai", "ASC"]],
+    });
+
+    // filter yang masih dalam rentang waktu
+    const activeValid = ujianList.filter(u => now < u.waktuSelesai);
+
+    res.json({ success: true, data: activeValid });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Gagal mengambil ujian aktif" });
+  }
+};
+// ========== GET SEMUA HASIL UJIAN (Kepala Unit) ==========
+export const getAllHasilUjian = async (req, res) => {
+  try {
+    if (req.user.role !== "kepala unit") {
+      return res.status(403).json({
+        success: false,
+        message: "Hanya kepala unit yang dapat melihat semua hasil ujian",
+      });
+    }
+
+    // Ambil semua ujian + peserta + user
+    const ujianList = await Ujian.findAll({
+      include: [
+        {
+          model: PesertaUjian,
+          as: "pesertaUjian",
+          include: [
+            {
+              model: User,
+              as: "pesertaUser",
+              attributes: ["id", "username", "unit"],
+            },
+          ],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    const hasilSemua = [];
+
+    for (const ujian of ujianList) {
+      for (const p of ujian.pesertaUjian) {
+        hasilSemua.push({
+          ujianId: ujian.id,
+          ujianJudul: ujian.judul,
+          ujianDeskripsi: ujian.deskripsi,
+          waktuMulai: ujian.waktuMulai,
+          waktuSelesai: ujian.waktuSelesai,
+
+          nama: p.pesertaUser?.username || "Tidak diketahui",
+          unit: p.pesertaUser?.unit || "-",
+
+          skor: p.skor ?? 0,
+          status: p.status === "selesai" ? "Selesai" : "Dalam Proses",
+
+          exitAttempts: p.exitAttempts ?? 0,
+          tabSwitchCount: p.tabSwitchCount ?? 0,
+          completedAt: p.completedAt,
+        });
+      }
+    }
+
+    return res.json({
+      success: true,
+      total: hasilSemua.length,
+      data: hasilSemua,
+    });
+  } catch (err) {
+    console.error("Error getAllHasilUjian:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Gagal mengambil semua hasil ujian",
+      error: err.message,
+    });
+  }
+};
+
+
 
 
 

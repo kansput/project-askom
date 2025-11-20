@@ -5,9 +5,8 @@ import Link from 'next/link';
 import NextImage from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { BookOpen, Plus, Save, Image, CheckCircle, Trash2, AlertCircle } from "lucide-react";
+import { BookOpen, Plus, Save, Image, CheckCircle, Trash2, AlertCircle, Edit, X, Check } from "lucide-react";
 import { toast } from "react-hot-toast";
-
 
 export default function CreateBatchSoalPage() {
     const [nama, setNama] = useState("");
@@ -25,8 +24,15 @@ export default function CreateBatchSoalPage() {
     ]);
     const [jawabanBenar, setJawabanBenar] = useState("A");
     const [listSoal, setListSoal] = useState([]);
-
     const [token, setToken] = useState("");
+
+    // STATE UNTUK EDIT MODE
+    const [editingIndex, setEditingIndex] = useState(null);
+    const [editPertanyaan, setEditPertanyaan] = useState("");
+    const [editOpsi, setEditOpsi] = useState([]);
+    const [editJawabanBenar, setEditJawabanBenar] = useState("");
+    const [editGambarFile, setEditGambarFile] = useState(null);
+    const [editGambarPreview, setEditGambarPreview] = useState("");
 
     useEffect(() => {
         setToken(localStorage.getItem("token") || "");
@@ -35,11 +41,98 @@ export default function CreateBatchSoalPage() {
     const searchParams = useSearchParams();
     const editId = searchParams.get("edit");
 
+    // 🔄 FUNGSI UNTUK EDIT SOAL
+    const handleEditSoal = (index) => {
+        const soal = listSoal[index];
+        setEditingIndex(index);
+        setEditPertanyaan(soal.pertanyaan);
+        setEditOpsi([...soal.opsi]);
+        setEditJawabanBenar(soal.jawabanBenar);
+        setEditGambarPreview(soal.gambarPreview || "");
+        setEditGambarFile(null);
+    };
 
-    const openConfirm = (message, action) => {
-        setConfirmMessage(message);
-        setConfirmAction(() => action);
-        setShowConfirm(true);
+    // ❌ BATAL EDIT
+    const handleCancelEdit = () => {
+        setEditingIndex(null);
+        setEditPertanyaan("");
+        setEditOpsi([]);
+        setEditJawabanBenar("");
+        setEditGambarFile(null);
+        setEditGambarPreview("");
+    };
+
+    // 💾 SIMPAN EDIT
+    const handleSaveEdit = async (index) => {
+        if (!editPertanyaan) return toast.error("Pertanyaan harus diisi!");
+        if (editOpsi.some((o) => !o.text)) return toast.error("Semua opsi harus diisi!");
+
+        const updatedSoal = {
+            ...listSoal[index],
+            pertanyaan: editPertanyaan,
+            opsi: editOpsi,
+            jawabanBenar: editJawabanBenar,
+            gambarFile: editGambarFile || listSoal[index].gambarFile,
+            gambarPreview: editGambarPreview || listSoal[index].gambarPreview
+        };
+
+        const newList = [...listSoal];
+        newList[index] = updatedSoal;
+        setListSoal(newList);
+
+        // Jika soal sudah ada di backend, langsung update
+        if (updatedSoal.id && editId) {
+            try {
+                const formData = new FormData();
+                formData.append("pertanyaan", updatedSoal.pertanyaan);
+                formData.append("jawabanBenar", updatedSoal.jawabanBenar);
+                formData.append("opsi", JSON.stringify(updatedSoal.opsi));
+
+                if (updatedSoal.gambarFile) {
+                    formData.append("gambar", updatedSoal.gambarFile);
+                }
+
+                const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/batchsoal/${editId}/soal/${updatedSoal.id}`,
+                    {
+                        method: "PUT",
+                        headers: { Authorization: `Bearer ${token}` },
+                        body: formData,
+                    }
+                );
+
+                const data = await res.json();
+                if (!data.success) {
+                    toast.error(data.message || "Gagal update soal");
+                    return;
+                }
+
+                toast.success("Soal berhasil diperbarui!");
+            } catch (err) {
+                console.error("Error update soal:", err);
+                toast.error("Terjadi kesalahan saat update soal");
+            }
+        }
+
+        handleCancelEdit();
+    };
+
+    // 🖼️ HANDLE EDIT GAMBAR
+    const handleEditImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setEditGambarFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setEditGambarPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleRemoveEditImage = () => {
+        setEditGambarFile(null);
+        setEditGambarPreview("");
     };
 
     useEffect(() => {
@@ -50,8 +143,8 @@ export default function CreateBatchSoalPage() {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const data = await res.json();
-                console.log("DEBUG - Response Backend untuk Edit:", data); // <-- Tambah ini
-                console.log("DEBUG - Soals Gambar:", data.data.soals.map(s => ({ id: s.id, gambar: s.gambar }))); // <-- Lihat gambar path
+                console.log("DEBUG - Response Backend untuk Edit:", data);
+                console.log("DEBUG - Soals Gambar:", data.data.soals.map(s => ({ id: s.id, gambar: s.gambar })));
 
                 if (data.success) {
                     setNama(data.data.nama);
@@ -61,7 +154,6 @@ export default function CreateBatchSoalPage() {
                             id: s.id,
                             pertanyaan: s.pertanyaan,
                             gambar: s.gambar,
-                            // TAMBAHKAN BARIS INI (INI YANG HILANG!)
                             gambarPreview: s.gambar ? `${process.env.NEXT_PUBLIC_API_URL}${s.gambar}` : null,
                             gambarFile: null,
                             opsi: s.opsi,
@@ -76,36 +168,6 @@ export default function CreateBatchSoalPage() {
         if (editId && token) fetchDetail();
     }, [editId, token]);
 
-
-
-    const ConfirmModal = ({ message, onConfirm, onCancel }) => (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="bg-white rounded-xl p-6 w-[380px] shadow-2xl">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 text-amber-600">
-                        <AlertCircle className="w-6 h-6" />
-                    </div>
-                    <h2 className="text-lg font-semibold text-gray-800">Konfirmasi</h2>
-                </div>
-                <p className="text-sm text-gray-600 mb-6">{message}</p>
-                <div className="flex justify-end gap-3">
-                    <button
-                        onClick={onCancel}
-                        className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
-                    >
-                        Batal
-                    </button>
-                    <button
-                        onClick={onConfirm}
-                        className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-medium shadow-md"
-                    >
-                        Ya, Hapus
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-
     const handleAddSoal = (e) => {
         e.preventDefault();
         if (!pertanyaan) return toast.error(" Pertanyaan harus diisi!");
@@ -113,9 +175,9 @@ export default function CreateBatchSoalPage() {
 
         const newSoal = {
             pertanyaan,
-            gambar: gambarPreview,   
-            gambarFile, 
-            gambarPreview: gambarPreview,             
+            gambar: gambarPreview,
+            gambarFile,
+            gambarPreview: gambarPreview,
             opsi,
             jawabanBenar,
         };
@@ -135,7 +197,6 @@ export default function CreateBatchSoalPage() {
         ]);
         setJawabanBenar("A");
     };
-
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -158,7 +219,6 @@ export default function CreateBatchSoalPage() {
     const handleRemoveSoal = async (index) => {
         const soal = listSoal[index];
 
-        // kalau soal lama (sudah punya id di backend)
         if (soal.id && editId) {
             try {
                 const res = await fetch(
@@ -181,11 +241,9 @@ export default function CreateBatchSoalPage() {
             }
         }
 
-        // update state lokal supaya UI langsung berubah
         const newList = listSoal.filter((_, idx) => idx !== index);
         setListSoal(newList);
     };
-
 
     const handleSaveBatch = async () => {
         if (!nama) return toast.error("Nama batch wajib diisi!");
@@ -222,8 +280,6 @@ export default function CreateBatchSoalPage() {
             const formData = new FormData();
             formData.append("pertanyaan", soal.pertanyaan);
             formData.append("jawabanBenar", soal.jawabanBenar);
-
-            //  perbaikan di sini
             formData.append("opsi", JSON.stringify(soal.opsi));
 
             if (soal.gambarFile) {
@@ -238,7 +294,7 @@ export default function CreateBatchSoalPage() {
 
             const resSoal = await fetch(url, {
                 method,
-                headers: { Authorization: `Bearer ${token}` }, // JANGAN set Content-Type saat pakai FormData
+                headers: { Authorization: `Bearer ${token}` },
                 body: formData,
             });
 
@@ -256,9 +312,208 @@ export default function CreateBatchSoalPage() {
         }, 1500);
     };
 
+    // 🔄 TAMPILAN SOAL DALAM MODE EDIT
+    const renderSoalInEditMode = (s, idx) => (
+        <div className="border-2 border-blue-300 rounded-lg p-5 bg-blue-50">
+            <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start gap-3 flex-1">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                        {idx + 1}
+                    </div>
+                    <div className="flex-1 space-y-4">
+                        {/* EDIT PERTANYAAN */}
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                Pertanyaan <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                value={editPertanyaan}
+                                onChange={(e) => setEditPertanyaan(e.target.value)}
+                                className="w-full border border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 p-3 rounded-lg transition-all outline-none resize-none text-slate-900"
+                                rows="4"
+                                required
+                            />
+                        </div>
 
+                        {/* EDIT GAMBAR */}
+                        <div>
+                            <label className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                                <Image className="w-4 h-4" alt="" />
+                                Gambar Soal (Opsional)
+                            </label>
+                            <div className="space-y-3">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleEditImageChange}
+                                    className="w-full border border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 p-3 rounded-lg transition-all outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                />
+                                {(editGambarPreview || s.gambarPreview) && (
+                                    <div className="relative inline-block">
+                                        <NextImage
+                                            src={editGambarPreview || s.gambarPreview}
+                                            alt="Preview"
+                                            width={320}
+                                            height={192}
+                                            className="max-w-xs max-h-48 rounded-lg border-2 border-blue-300 shadow-sm"
+                                            style={{ objectFit: "contain" }}
+                                            onClick={() => setZoomImage(editGambarPreview || s.gambarPreview)}
+                                        />
+                                        <button
+                                            onClick={handleRemoveEditImage}
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-all shadow-md"
+                                            title="Hapus gambar"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            {/* EDIT OPSI JAWABAN */}
+            <div className="ml-11 space-y-3">
+                <label className="block text-sm font-semibold text-slate-700">
+                    Opsi Jawaban <span className="text-red-500">*</span>
+                </label>
+                <div className="grid gap-3">
+                    {editOpsi.map((o, opsiIdx) => (
+                        <div key={o.kode} className="flex items-center gap-3 group">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center font-bold text-blue-700">
+                                {o.kode}
+                            </div>
+                            <input
+                                type="text"
+                                value={o.text}
+                                onChange={(e) => {
+                                    const newOpsi = [...editOpsi];
+                                    newOpsi[opsiIdx].text = e.target.value;
+                                    setEditOpsi(newOpsi);
+                                }}
+                                className="flex-1 border border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 p-3 rounded-lg transition-all outline-none text-slate-900"
+                                required
+                            />
+                        </div>
+                    ))}
+                </div>
+            </div>
 
+            {/* EDIT JAWABAN BENAR */}
+            <div className="ml-11 flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200 mt-4">
+                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <label className="font-semibold text-slate-700">Jawaban Benar:</label>
+                <select
+                    value={editJawabanBenar}
+                    onChange={(e) => setEditJawabanBenar(e.target.value)}
+                    className="border border-green-300 bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 px-4 py-2 rounded-lg transition-all outline-none font-semibold text-green-700"
+                >
+                    {editOpsi.map((o) => (
+                        <option key={o.kode} value={o.kode}>
+                            Opsi {o.kode}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            {/* TOMBOL ACTION EDIT */}
+            <div className="ml-11 flex gap-3 mt-4">
+                <button
+                    onClick={() => handleSaveEdit(idx)}
+                    className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-all flex items-center gap-2"
+                >
+                    <Check className="w-4 h-4" />
+                    Simpan Perubahan
+                </button>
+                <button
+                    onClick={handleCancelEdit}
+                    className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg transition-all flex items-center gap-2"
+                >
+                    <X className="w-4 h-4" />
+                    Batal
+                </button>
+            </div>
+        </div>
+    );
+
+    // 🔄 TAMPILAN SOAL NORMAL (VIEW MODE)
+    const renderSoalInViewMode = (s, idx) => (
+        <div className="border border-slate-200 rounded-lg p-5 hover:border-blue-300 hover:shadow-md transition-all bg-gradient-to-r from-white to-slate-50">
+            <div className="flex items-start justify-between gap-4 mb-4">
+                <div className="flex items-start gap-3 flex-1">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+                        {idx + 1}
+                    </div>
+                    <div className="flex-1">
+                        <p className="font-semibold text-slate-800 leading-relaxed">{s.pertanyaan}</p>
+                        {s.gambarPreview && (
+                            <div className="mt-3">
+                                <NextImage
+                                    src={s.gambarPreview}
+                                    alt="Gambar soal"
+                                    width={320}
+                                    height={160}
+                                    className="max-w-sm max-h-40 rounded-lg border-2 border-slate-200 shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
+                                    style={{ objectFit: "contain" }}
+                                    unoptimized
+                                    onClick={() => setZoomImage(s.gambarPreview)}
+                                    onError={() => console.warn("Gambar gagal load:", s.gambarPreview)}
+                                />
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => handleEditSoal(idx)}
+                        className="flex-shrink-0 p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+                        title="Edit soal"
+                    >
+                        <Edit className="w-5 h-5" />
+                    </button>
+                    <button
+                        onClick={() => handleRemoveSoal(idx)}
+                        className="flex-shrink-0 p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                        title="Hapus soal"
+                    >
+                        <Trash2 className="w-5 h-5" />
+                    </button>
+                </div>
+            </div>
+            <div className="ml-11 space-y-2">
+                {s.opsi.map((o) => (
+                    <div
+                        key={o.kode}
+                        className={`flex items-center gap-3 p-3 rounded-lg transition-all ${o.kode === s.jawabanBenar
+                            ? "bg-green-50 border border-green-200"
+                            : "bg-slate-50 border border-slate-200"
+                            }`}
+                    >
+                        <span
+                            className={`font-bold ${o.kode === s.jawabanBenar ? "text-green-700" : "text-slate-600"
+                                }`}
+                        >
+                            {o.kode}.
+                        </span>
+                        <span
+                            className={`flex-1 ${o.kode === s.jawabanBenar ? "text-slate-800 font-medium" : "text-slate-700"
+                                }`}
+                        >
+                            {o.text}
+                        </span>
+                        {o.kode === s.jawabanBenar && (
+                            <div className="flex items-center gap-1 text-green-600 font-semibold text-sm">
+                                <CheckCircle className="w-4 h-4" />
+                                <span>Benar</span>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 
     return (
         <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -419,72 +674,11 @@ export default function CreateBatchSoalPage() {
                         </div>
                         <div className="space-y-4">
                             {listSoal.map((s, idx) => (
-                                <div
-                                    key={idx}
-                                    className="border border-slate-200 rounded-lg p-5 hover:border-blue-300 hover:shadow-md transition-all bg-gradient-to-r from-white to-slate-50"
-                                >
-                                    <div className="flex items-start justify-between gap-4 mb-4">
-                                        <div className="flex items-start gap-3 flex-1">
-                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
-                                                {idx + 1}
-                                            </div>
-                                            <div className="flex-1">
-                                                <p className="font-semibold text-slate-800 leading-relaxed">{s.pertanyaan}</p>
-                                                {s.gambarPreview && (
-                                                    <div className="mt-3">
-                                                        <NextImage
-                                                            src={s.gambarPreview}
-                                                            alt="Gambar soal"
-                                                            width={320}
-                                                            height={160}
-                                                            className="max-w-sm max-h-40 rounded-lg border-2 border-slate-200 shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
-                                                            style={{ objectFit: "contain" }}
-                                                            unoptimized
-                                                            onClick={() => setZoomImage(s.gambarPreview)}
-                                                            onError={() => console.warn("Gambar gagal load:", s.gambarPreview)}
-                                                        />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => handleRemoveSoal(idx)}
-                                            className="flex-shrink-0 p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                                            title="Hapus soal"
-                                        >
-                                            <Trash2 className="w-5 h-5" />
-                                        </button>
-                                    </div>
-                                    <div className="ml-11 space-y-2">
-                                        {s.opsi.map((o) => (
-                                            <div
-                                                key={o.kode}
-                                                className={`flex items-center gap-3 p-3 rounded-lg transition-all ${o.kode === s.jawabanBenar
-                                                    ? "bg-green-50 border border-green-200"
-                                                    : "bg-slate-50 border border-slate-200"
-                                                    }`}
-                                            >
-                                                <span
-                                                    className={`font-bold ${o.kode === s.jawabanBenar ? "text-green-700" : "text-slate-600"
-                                                        }`}
-                                                >
-                                                    {o.kode}.
-                                                </span>
-                                                <span
-                                                    className={`flex-1 ${o.kode === s.jawabanBenar ? "text-slate-800 font-medium" : "text-slate-700"
-                                                        }`}
-                                                >
-                                                    {o.text}
-                                                </span>
-                                                {o.kode === s.jawabanBenar && (
-                                                    <div className="flex items-center gap-1 text-green-600 font-semibold text-sm">
-                                                        <CheckCircle className="w-4 h-4" />
-                                                        <span>Benar</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
+                                <div key={idx}>
+                                    {editingIndex === idx
+                                        ? renderSoalInEditMode(s, idx)
+                                        : renderSoalInViewMode(s, idx)
+                                    }
                                 </div>
                             ))}
                         </div>
@@ -522,7 +716,6 @@ export default function CreateBatchSoalPage() {
                     onClick={() => setZoomImage(null)}
                 >
                     <div className="relative max-w-4xl w-full">
-                        {/* Tombol Close */}
                         <button
                             onClick={() => setZoomImage(null)}
                             className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
@@ -532,7 +725,6 @@ export default function CreateBatchSoalPage() {
                             </svg>
                         </button>
 
-                        {/* GUNAKAN NextImage + unoptimized + ref */}
                         <div className="overflow-hidden rounded-lg shadow-2xl">
                             <NextImage
                                 src={zoomImage}
@@ -541,9 +733,8 @@ export default function CreateBatchSoalPage() {
                                 height={800}
                                 className="w-full h-auto max-h-screen object-contain cursor-zoom-in transition-transform duration-200"
                                 style={{ transform: "scale(1)" }}
-                                unoptimized // MATIKAN OPTIMASI → BISA ZOOM!
+                                unoptimized
                                 onClick={(e) => e.stopPropagation()}
-                                // Gunakan ref + useEffect untuk wheel zoom
                                 ref={(el) => {
                                     if (el) {
                                         el.style.transform = "scale(1)";
@@ -567,3 +758,4 @@ export default function CreateBatchSoalPage() {
         </div>
     );
 }
+

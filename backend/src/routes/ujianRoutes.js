@@ -10,6 +10,8 @@ import {
    submitUjian,
    startUjianPeserta,
    getHasilUjian,
+   getActiveUjianForPeserta,
+   getAllHasilUjian,
 } from "../controllers/ujianController.js";
 
 const router = Router();
@@ -32,11 +34,14 @@ router.post("/:id/start-global", verifyToken, startUjian);
 router.post("/:id/stop", verifyToken, stopUjian);
 router.delete("/:id", verifyToken, deleteUjian);
 router.get("/", verifyToken, getAllUjian);
+router.get("/hasil/all", verifyToken, getAllHasilUjian);
 
 /* ================================================================
    🧑‍⚕️ PERAWAT
    ================================================================ */
 router.post("/:id/start", verifyToken, startUjianPeserta);
 router.post("/:id/submit", verifyToken, submitUjian);
+router.get("/active/list", verifyToken, getActiveUjianForPeserta);
+
 
 export default router;

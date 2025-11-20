@@ -204,7 +204,7 @@ export default function CreateUjianPage() {
   const handleStartUjian = async (id) => {
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ujian/${id}/start`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ujian/${id}/start-global`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -217,12 +217,10 @@ export default function CreateUjianPage() {
       }
 
       if (data.success) {
-        setUjianList((prev) =>
-          prev.map((u) => (u.id === id ? { ...u, status: "active" } : u))
+        setUjianList(prev =>
+          prev.map(u => (u.id === id ? { ...u, status: "active" } : u))
         );
-        toast.success(" Ujian sudah dimulai!");
-      } else {
-        toast.error(data.message || "Gagal memulai ujian");
+        toast.success("Ujian sudah dimulai!");
       }
     } catch (error) {
       toast.error("Terjadi kesalahan jaringan, coba lagi.");
@@ -230,6 +228,7 @@ export default function CreateUjianPage() {
       setLoading(false);
     }
   };
+
 
   // stop ujian
   const handleStopUjian = async (id) => {
@@ -276,13 +275,8 @@ export default function CreateUjianPage() {
   };
 
   // cari ujian yang sedang aktif
-  const ujianAktif = ujianList.find((u) => u.status === "active");
+  const ujianAktifList = ujianList.filter((u) => u.status === "active");
   const draftList = ujianList.filter((u) => u.status === "draft");
-
-
-
-
-
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -310,131 +304,137 @@ export default function CreateUjianPage() {
           </div>
 
           {/* Ujian Aktif Section */}
-          {ujianAktif && (
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg p-8 mb-6 border-2 border-green-200 relative overflow-hidden">
-              {/* Animated Background Effect */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-green-200 rounded-full opacity-20 -translate-y-16 translate-x-16"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-200 rounded-full opacity-20 translate-y-12 -translate-x-12"></div>
+          {ujianAktifList.length > 0 && (
+            <>
+              {ujianAktifList.map(ujianAktif => (
+                <div key={ujianAktif.id} >
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg p-8 mb-6 border-2 border-green-200 relative overflow-hidden">
+                    {/* Animated Background Effect */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-green-200 rounded-full opacity-20 -translate-y-16 translate-x-16"></div>
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-200 rounded-full opacity-20 translate-y-12 -translate-x-12"></div>
 
-              <div className="relative z-10">
-                {/* Header dengan Status Badge */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-green-500 p-3 rounded-xl shadow-md animate-pulse">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-green-800">
-                        Ujian Sedang Berlangsung
-                      </h2>
-                      <p className="text-sm text-green-600 font-medium">Live Now</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg">
-                    <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                    AKTIF
-                  </div>
-                </div>
-
-                <div className="flex justify-end mt-6">
-                  <button
-                    onClick={() =>
-                      openConfirm(
-                        "Yakin ingin menghentikan ujian ini sekarang?",
-                        () => handleStopUjian(ujianAktif.id)
-                      )
-                    }
-                    className="bg-gradient-to-r from-red-500 to-rose-600 text-white px-6 py-2 rounded-lg shadow-md hover:from-red-600 hover:to-rose-700 transition-all"
-                  >
-                    Hentikan Ujian
-                  </button>
-
-                </div>
-
-
-                {/* Content Card */}
-                <div className="bg-white rounded-xl p-6 shadow-md">
-                  {/* Judul Ujian */}
-                  <div className="mb-5 pb-5 border-b border-gray-200">
-                    <div className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <div className="flex-1">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                          Judul Ujian
-                        </p>
-                        <p className="text-lg font-bold text-gray-800">
-                          {ujianAktif.judul}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Deskripsi */}
-                  <div className="mb-5 pb-5 border-b border-gray-200">
-                    <div className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" />
-                      </svg>
-                      <div className="flex-1">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                          Deskripsi
-                        </p>
-                        <p className="text-gray-700 leading-relaxed">
-                          {ujianAktif.deskripsi}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Jadwal Waktu */}
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4">
-                    <div className="flex items-start gap-3">
-                      <svg className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <div className="flex-1">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                          Jadwal
-                        </p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div className="bg-white rounded-lg p-3 shadow-sm">
-                            <p className="text-xs text-gray-500 font-medium mb-1">Mulai</p>
-                            <p className="text-sm font-bold text-gray-800">
-                              {new Date(ujianAktif.waktuMulai).toLocaleString("id-ID", {
-                                weekday: "long",
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit"
-                              })}
-                            </p>
+                    <div className="relative z-10">
+                      {/* Header dengan Status Badge */}
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-green-500 p-3 rounded-xl shadow-md animate-pulse">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
                           </div>
-                          <div className="bg-white rounded-lg p-3 shadow-sm">
-                            <p className="text-xs text-gray-500 font-medium mb-1">Selesai</p>
-                            <p className="text-sm font-bold text-gray-800">
-                              {new Date(ujianAktif.waktuSelesai).toLocaleString("id-ID", {
-                                weekday: "long",
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit"
-                              })}
-                            </p>
+                          <div>
+                            <h2 className="text-2xl font-bold text-green-800">
+                              Ujian Sedang Berlangsung
+                            </h2>
+                            <p className="text-sm text-green-600 font-medium">Live Now</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg">
+                          <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                          AKTIF
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end mt-6">
+                        <button
+                          onClick={() =>
+                            openConfirm(
+                              "Yakin ingin menghentikan ujian ini sekarang?",
+                              () => handleStopUjian(ujianAktif.id)
+                            )
+                          }
+                          className="bg-gradient-to-r from-red-500 to-rose-600 text-white px-6 py-2 rounded-lg shadow-md hover:from-red-600 hover:to-rose-700 transition-all"
+                        >
+                          Hentikan Ujian
+                        </button>
+
+                      </div>
+
+
+                      {/* Content Card */}
+                      <div className="bg-white rounded-xl p-6 shadow-md">
+                        {/* Judul Ujian */}
+                        <div className="mb-5 pb-5 border-b border-gray-200">
+                          <div className="flex items-start gap-3">
+                            <svg className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <div className="flex-1">
+                              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                                Judul Ujian
+                              </p>
+                              <p className="text-lg font-bold text-gray-800">
+                                {ujianAktif.judul}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Deskripsi */}
+                        <div className="mb-5 pb-5 border-b border-gray-200">
+                          <div className="flex items-start gap-3">
+                            <svg className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" />
+                            </svg>
+                            <div className="flex-1">
+                              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                                Deskripsi
+                              </p>
+                              <p className="text-gray-700 leading-relaxed">
+                                {ujianAktif.deskripsi}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Jadwal Waktu */}
+                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4">
+                          <div className="flex items-start gap-3">
+                            <svg className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <div className="flex-1">
+                              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                                Jadwal
+                              </p>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div className="bg-white rounded-lg p-3 shadow-sm">
+                                  <p className="text-xs text-gray-500 font-medium mb-1">Mulai</p>
+                                  <p className="text-sm font-bold text-gray-800">
+                                    {new Date(ujianAktif.waktuMulai).toLocaleString("id-ID", {
+                                      weekday: "long",
+                                      year: "numeric",
+                                      month: "long",
+                                      day: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit"
+                                    })}
+                                  </p>
+                                </div>
+                                <div className="bg-white rounded-lg p-3 shadow-sm">
+                                  <p className="text-xs text-gray-500 font-medium mb-1">Selesai</p>
+                                  <p className="text-sm font-bold text-gray-800">
+                                    {new Date(ujianAktif.waktuSelesai).toLocaleString("id-ID", {
+                                      weekday: "long",
+                                      year: "numeric",
+                                      month: "long",
+                                      day: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit"
+                                    })}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              ))}
+            </>
           )}
 
           {/* Draft Ujian Section */}
