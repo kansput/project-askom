@@ -350,7 +350,7 @@ export default function CreateBatchSoalPage() {
                                 />
                                 {(editGambarPreview || s.gambarPreview) && (
                                     <div className="relative inline-block">
-                                        <NextImage
+                                        <Image
                                             src={editGambarPreview || s.gambarPreview}
                                             alt="Preview"
                                             width={320}
