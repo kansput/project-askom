@@ -795,6 +795,61 @@ export default function PenilaianPage() {
                   </div>
                 </div>
               </div>
+              {/* Keterangan Nilai – 2 Kolom, Bahasa Bagus & Profesional */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                  <div className="w-2 h-6 bg-amber-500 rounded mr-3"></div>
+                  Keterangan Nilai (Skala 0 – 4)
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Kolom Kiri */}
+                  <div className="space-y-3">
+                    {[
+                      { nilai: 4, label: "Sangat Baik", desc: "Sangat kompeten", color: "bg-emerald-50 text-emerald-700" },
+                      { nilai: 3.5, label: "Baik", desc: "Hampir sangat kompeten", color: "bg-emerald-50 text-emerald-700" },
+                      { nilai: 3, label: "Baik", desc: "Kompeten", color: "bg-blue-50 text-blue-700" },
+                      { nilai: 2.5, label: "Cukup Baik", desc: "Cukup kompeten, ada sedikit kekurangan", color: "bg-amber-50 text-amber-700" },
+                    ].map((item) => (
+                      <div key={item.nilai} className={`p-3 rounded-lg ${item.color} flex items-center space-x-3 transition-all hover:shadow-sm`}>
+                        <span className="w-9 h-9 bg-white rounded-full flex items-center justify-center font-bold text-sm shadow-sm">
+                          {item.nilai}
+                        </span>
+                        <div>
+                          <div className="font-medium">{item.label}</div>
+                          <div className="text-xs opacity-80">{item.desc}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Kolom Kanan */}
+                  <div className="space-y-3">
+                    {[
+                      { nilai: 2, label: "Cukup", desc: "Kurang kompeten, perlu perbaikan", color: "bg-amber-50 text-amber-700" },
+                      { nilai: 1.5, label: "Kurang", desc: "Perlu perbaikan signifikan", color: "bg-orange-50 text-orange-700" },
+                      { nilai: 1, label: "Sangat Kurang", desc: "Tidak kompeten, perlu bimbingan intensif", color: "bg-red-50 text-red-700" },
+                      { nilai: 0, label: "Tidak Dinilai", desc: "Belum diberi nilai", color: "bg-gray-50 text-gray-600" },
+                    ].map((item) => (
+                      <div key={item.nilai} className={`p-3 rounded-lg ${item.color} flex items-center space-x-3 transition-all hover:shadow-sm`}>
+                        <span className="w-9 h-9 bg-white rounded-full flex items-center justify-center font-bold text-sm shadow-sm">
+                          {item.nilai}
+                        </span>
+                        <div>
+                          <div className="font-medium">{item.label}</div>
+                          <div className="text-xs opacity-80">{item.desc}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-5 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                  <p className="text-xs text-amber-800 text-center font-medium">
+                    Skala penilaian: 0, 1, 1.5, 2, 2.5, 3, 3.5, 4
+                  </p>
+                </div>
+              </div>
 
               {/* Status & Actions */}
               <StatusActions

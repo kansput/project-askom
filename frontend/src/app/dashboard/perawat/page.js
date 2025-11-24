@@ -181,7 +181,7 @@ export default function PerawatDashboard() {
             </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            <CardItem image="/str.jpg" title="Permohonan Kredensial & SPKK" href="/dashboard/perawat/dokumen" />
+            <CardItem image="/str.jpg" title="Permohonan Kredensial & Pengkajian Mandiri" href="/dashboard/perawat/dokumen" />
             <CardItem image="/spkk.png" title="Upload Dokumen STR & SIP" href="/dashboard/perawat/str" />
             <CardItem image="/badges.png" title="Upload Sertifikat" href="/dashboard/perawat/sertifikat" />
           </div>
