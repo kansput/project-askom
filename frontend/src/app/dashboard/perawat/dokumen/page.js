@@ -198,8 +198,8 @@ export default function DokumenPage() {
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-800">Form Permohonan Kredensial & SPKK</h2>
-              <p className="text-sm text-gray-600">Upload kedua dokumen kredensial dan SPKK secara bersamaan</p>
+              <h2 className="text-lg font-bold text-gray-800">Form Permohonan Kredensial & Pengkajian Mandiri</h2>
+              <p className="text-sm text-gray-600">Upload kedua dokumen kredensial dan Pengkajian Mandiri secara bersamaan</p>
             </div>
           </div>
         </div>
@@ -306,7 +306,7 @@ export default function DokumenPage() {
                 <div className="bg-blue-100 p-2 rounded-lg">
                   <FileText className="w-4 h-4 text-blue-600" />
                 </div>
-                <h3 className="font-semibold text-sm text-gray-800">Permohonan SPKK</h3>
+                <h3 className="font-semibold text-sm text-gray-800">Pengkajian Mandiri </h3>
               </div>
 
               <div

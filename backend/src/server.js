@@ -170,7 +170,7 @@ const startServer = async () => {
     await sequelize.sync({ alter: true });
     console.log("Database models synced successfully");
 
-    console.log("Registered Models:", Object.keys(sequelize.models));
+ 
 
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running at http://0.0.0.0:${PORT}`);
