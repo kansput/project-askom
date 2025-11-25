@@ -252,7 +252,22 @@ export default function StrRiwayatPage() {
 
                 {/* Stats Cards */}
                 {!loading && !error && (
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-gray-600">Dokumen Ijazah</p>
+                                    <p className="text-2xl font-bold text-gray-900 mt-1">
+                                        {docs.filter(d => d.fileIjazah).length}
+                                    </p>
+                                </div>
+                                <div className="p-2 bg-blue-100 rounded-lg">
+                                    <FileText className="w-5 h-5 text-blue-600" />
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                             <div className="flex items-center justify-between">
                                 <div>
@@ -529,6 +544,21 @@ export default function StrRiwayatPage() {
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <div className="flex gap-1">
+
+                                                        {/* Ijazah */}
+                                                        {doc.fileIjazah && (
+                                                            <a
+                                                                href={`${process.env.NEXT_PUBLIC_API_URL}/${doc.fileIjazah}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="p-2 bg-blue-100 hover:bg-blue-200 rounded transition"
+                                                                title="Download Ijazah"
+                                                            >
+                                                                <Download className="w-4 h-4 text-blue-700" />
+                                                            </a>
+                                                        )}
+
+                                                        {/* STR */}
                                                         {doc.fileSTR && (
                                                             <a
                                                                 href={`${process.env.NEXT_PUBLIC_API_URL}/${doc.fileSTR}`}
@@ -540,6 +570,8 @@ export default function StrRiwayatPage() {
                                                                 <Download className="w-4 h-4 text-green-700" />
                                                             </a>
                                                         )}
+
+                                                        {/* SIP */}
                                                         {doc.fileSIP && (
                                                             <a
                                                                 href={`${process.env.NEXT_PUBLIC_API_URL}/${doc.fileSIP}`}
@@ -552,6 +584,7 @@ export default function StrRiwayatPage() {
                                                             </a>
                                                         )}
 
+                                                        {/* RKK */}
                                                         {doc.fileRKK && (
                                                             <a
                                                                 href={`${process.env.NEXT_PUBLIC_API_URL}/${doc.fileRKK}`}
@@ -566,6 +599,7 @@ export default function StrRiwayatPage() {
 
                                                     </div>
                                                 </td>
+
                                                 <td className="px-4 py-3 whitespace-nowrap">
                                                     <button
                                                         onClick={() => handleDelete(doc.id)}

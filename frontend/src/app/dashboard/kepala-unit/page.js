@@ -273,7 +273,7 @@ export default function KepalaUnitDashboard() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             <CardItem image="/str.jpg" title="Daftar Dokumen STR & SIP" href="/str-page/" />
-            <CardItem image="/spkk.png" title="Daftar Dokumen Kredensial & SPKK" href="/kredokumen-page/" />
+            <CardItem image="/spkk.png" title="Daftar Dokumen Kredensial & Pengkajian Mandiri" href="/kredokumen-page/" />
             <CardItem image="/badges.png" title="Daftar Sertifikat" href="/dashboard/kepala-unit/sertifikat-page/" />
           </div>
         </section>

@@ -241,7 +241,7 @@ export default function KredoRiwayatPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
-            <Navbar title="Riwayat Dokumen Kredensial & SPKK" />
+            <Navbar title="Riwayat Dokumen Kredensial & Pengkajian Mandiri" />
 
             <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
                 {/* Header Section */}
@@ -250,7 +250,7 @@ export default function KredoRiwayatPage() {
                         <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg">
                             <FileText className="w-6 h-6 text-white" />
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-900">Riwayat Dokumen Kredensial & SPKK</h1>
+                        <h1 className="text-3xl font-bold text-gray-900">Riwayat Dokumen Kredensial & Pengkajian Mandiri </h1>
                     </div>
                     <p className="text-gray-600 ml-14">Kelola dan pantau dokumen Kredensial & SPKK yang telah diupload</p>
                 </div>
