@@ -14,7 +14,7 @@ export const createOrUpdatePenilaian = async (req, res) => {
       nilai_akhir,
       grade,
       status,
-      keterangan_umum // 👈 TAMBAHAN
+      keterangan_umum 
     } = req.body;
 
     const currentUserNpk = req.user.npk;
@@ -48,7 +48,7 @@ export const createOrUpdatePenilaian = async (req, res) => {
       if (nilai_akhir !== undefined) updateData.nilai_akhir = nilai_akhir;
       if (grade !== undefined) updateData.grade = grade;
       if (status !== undefined) updateData.status = status;
-      if (keterangan_umum !== undefined) updateData.keterangan_umum = keterangan_umum; // 👈 TAMBAHAN
+      if (keterangan_umum !== undefined) updateData.keterangan_umum = keterangan_umum; 
 
       result = await existingPenilaian.update(updateData);
     } else {
@@ -63,10 +63,9 @@ export const createOrUpdatePenilaian = async (req, res) => {
         nilai_akhir: nilai_akhir || 0,
         grade: grade || 'D',
         status: status || 'draft',
-        keterangan_umum: keterangan_umum || null // 👈 TAMBAHAN
+        keterangan_umum: keterangan_umum || null 
       });
     }
-
     const updatedPenilaian = await PenilaianKeterampilan.findByPk(result.id, {
       include: [
         // (opsional) sesuaikan alias dengan yang ada di model kamu

@@ -192,7 +192,7 @@ export const handleSSO = async (req, res) => {
         areaKlinis: user.areaKlinis
       },
       process.env.JWT_SECRET || "default_secret",
-      { expiresIn: "1d" }
+      { expiresIn: "1y" }
     );
 
 
