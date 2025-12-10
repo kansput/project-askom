@@ -3,8 +3,11 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
-import { BookOpen, Plus, FileText, Edit, Eye, Trash2, Clock, Calendar, AlertCircle, Loader2, } from "lucide-react";
+import { BookOpen, Plus, FileText, Edit, Eye, Trash2, Clock, Calendar, AlertCircle, Loader2, FileDown } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { exportSingleBatchPdf } from "@/utils/exportBatchPdf";
+
+
 
 export default function BatchSoalListPage() {
   const [batchList, setBatchList] = useState([]);
@@ -209,10 +212,10 @@ export default function BatchSoalListPage() {
                           return Number.isNaN(d.getTime())
                             ? "N/A"
                             : d.toLocaleDateString("id-ID", {
-                                day: "numeric",
-                                month: "long",
-                                year: "numeric",
-                              });
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            });
                         })()}
                       </span>
                     </div>
@@ -225,10 +228,10 @@ export default function BatchSoalListPage() {
                             return Number.isNaN(d.getTime())
                               ? "N/A"
                               : `Diperbarui ${d.toLocaleDateString("id-ID", {
-                                  day: "numeric",
-                                  month: "long",
-                                  year: "numeric",
-                                })}`;
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              })}`;
                           })()}
                         </span>
                       </div>
@@ -237,6 +240,8 @@ export default function BatchSoalListPage() {
 
                   {/* Actions */}
                   <div className="flex gap-2 pt-2">
+
+                    {/* DETAIL */}
                     <a
                       href={`/ujian/batchsoal/${batch.id}`}
                       className="flex-1 flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium px-4 py-2.5 rounded-lg transition-all border border-blue-200 hover:border-blue-300"
@@ -245,6 +250,7 @@ export default function BatchSoalListPage() {
                       <span>Detail</span>
                     </a>
 
+                    {/* EDIT */}
                     <a
                       href={`/ujian/batchsoal/create?edit=${batch.id}`}
                       className="flex-1 flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium px-4 py-2.5 rounded-lg transition-all border border-amber-200 hover:border-amber-300"
@@ -252,6 +258,8 @@ export default function BatchSoalListPage() {
                       <Edit className="w-4 h-4" />
                       <span>Edit</span>
                     </a>
+
+                    {/* DELETE */}
                     <button
                       onClick={() =>
                         openConfirm(
@@ -261,7 +269,6 @@ export default function BatchSoalListPage() {
                       }
                       disabled={deleteLoading === batch.id}
                       className="flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-700 font-medium px-4 py-2.5 rounded-lg transition-all border border-red-200 hover:border-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                      title="Hapus batch"
                     >
                       {deleteLoading === batch.id ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -269,6 +276,16 @@ export default function BatchSoalListPage() {
                         <Trash2 className="w-4 h-4" />
                       )}
                     </button>
+
+                    {/* DOWNLOAD PDF */}
+                    <button
+                      onClick={() => exportSingleBatchPdf(batch)}
+                      className="flex-1 flex items-center justify-center gap-2 bg-purple-50 hover:bg-purple-100 text-purple-700 font-medium px-4 py-2.5 rounded-lg transition-all border border-purple-200 hover:border-purple-300"
+                    >
+                      <FileDown className="w-4 h-4" />
+                      <span>PDF</span>
+                    </button>
+
                   </div>
                 </div>
               </div>

@@ -276,45 +276,62 @@ export const submitUjian = async (req, res) => {
     const userId = req.user.id;
     const { jawaban, exitAttempts, tabSwitchCount } = req.body;
 
-    // 🔍 Cari peserta ujian
-    const peserta = await PesertaUjian.findOne({ where: { ujianId: id, userId } });
+    // Cari peserta ujian
+    const peserta = await PesertaUjian.findOne({
+      where: { ujianId: id, userId }
+    });
+
     if (!peserta) {
-      return res.status(403).json({ success: false, message: "Anda bukan peserta ujian ini" });
+      return res.status(403).json({
+        success: false,
+        message: "Anda bukan peserta ujian ini"
+      });
     }
 
     if (peserta.status === "selesai") {
-      return res.status(400).json({ success: false, message: "Ujian sudah disubmit sebelumnya" });
+      return res.status(400).json({
+        success: false,
+        message: "Ujian sudah disubmit sebelumnya"
+      });
     }
 
-    // 🔍 Ambil soal dari batch ujian
+    // Ambil soal dari batch ujian
     const ujian = await Ujian.findByPk(id, {
-      include: [{ association: "batchSoal", include: ["soals"] }],
+      include: [{ association: "batchSoal", include: ["soals"] }]
     });
-    if (!ujian) {
-      return res.status(404).json({ success: false, message: "Ujian tidak ditemukan" });
-    }
 
     const soals = ujian.batchSoal?.soals || [];
     let totalBenar = 0;
 
-    // 🔢 Cek jawaban benar
+    // 🟦 SIMPAN JAWABAN PESERTA KE DATABASE
     for (const soal of soals) {
-      const jawabanPeserta = jawaban[soal.id];
-      if (jawabanPeserta && jawabanPeserta === soal.jawabanBenar) {
-        totalBenar++;
-      }
+      const jawabanPeserta = jawaban[soal.id] || null;
+      const benar = jawabanPeserta === soal.jawabanBenar;
+
+      // hitung skor
+      if (benar) totalBenar++;
+
+      // simpan ke tabel JawabanOpsi
+      await JawabanOpsi.create({
+        pesertaUjianId: peserta.id,
+        soalId: soal.id,
+        jawabanPeserta: jawabanPeserta, // bisa null
+        isBenar: benar,
+        waktuSelesai: new Date()
+      });
     }
 
+    // hitung skor akhir
     const skor = (totalBenar / soals.length) * 100;
 
-    // 🧩 Update data peserta ujian
+    // update data peserta ujian
     peserta.skor = skor;
     peserta.exitAttempts = exitAttempts || 0;
     peserta.tabSwitchCount = tabSwitchCount || 0;
     peserta.completedAt = new Date();
     peserta.status = "selesai";
 
-    await peserta.save(); //  Simpan update-nya ke DB
+    await peserta.save();
 
     return res.json({
       success: true,
@@ -325,11 +342,17 @@ export const submitUjian = async (req, res) => {
         totalSoal: soals.length,
       },
     });
+
   } catch (err) {
-    console.error(" Error submitUjian:", err);
-    res.status(500).json({ success: false, message: "Gagal submit ujian", error: err.message });
+    console.error("Error submitUjian:", err);
+    res.status(500).json({
+      success: false,
+      message: "Gagal submit ujian",
+      error: err.message
+    });
   }
 };
+
 // ========== GET HASIL UJIAN ==========
 export const getHasilUjian = async (req, res) => {
   try {
@@ -459,6 +482,7 @@ export const getAllHasilUjian = async (req, res) => {
           ujianDeskripsi: ujian.deskripsi,
           waktuMulai: ujian.waktuMulai,
           waktuSelesai: ujian.waktuSelesai,
+          pesertaUjianId: p.id,
 
           nama: p.pesertaUser?.username || "Tidak diketahui",
           unit: p.pesertaUser?.unit || "-",
@@ -487,6 +511,26 @@ export const getAllHasilUjian = async (req, res) => {
     });
   }
 };
+// ========== GET JAWABAN PESERTA PER SOAL ==========
+export const getJawabanPeserta = async (req, res) => {
+  try {
+    const { pesertaUjianId } = req.params;
+
+    const jawaban = await JawabanOpsi.findAll({
+      where: { pesertaUjianId },
+      attributes: ["soalId", "jawabanPeserta", "isBenar"]
+    });
+
+    return res.json({ success: true, data: jawaban });
+  } catch (err) {
+    console.error("Error getJawabanPeserta:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Gagal mengambil jawaban peserta",
+    });
+  }
+};
+
 
 
 

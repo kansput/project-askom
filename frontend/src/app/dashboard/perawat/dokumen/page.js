@@ -139,7 +139,7 @@ export default function DokumenPage() {
       console.log('🔍 Response data:', result);
 
       if (result.success) {
-        toast.success('Dokumen berhasil diupload! 🎉');
+        toast.success('Dokumen berhasil diupload! ');
         setTanggal("");
         setFiles({ kredensial: null, spkk: null });
       } else {

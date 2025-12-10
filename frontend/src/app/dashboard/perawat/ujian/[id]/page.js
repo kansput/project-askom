@@ -379,8 +379,8 @@ export default function UjianDetailPage() {
             {timeRemaining != null && (
               <div
                 className={`px-3 py-1.5 rounded-lg text-xs font-mono font-semibold ${timeRemaining <= 300
-                    ? "bg-red-600 text-white animate-pulse"
-                    : "bg-blue-600 text-white"
+                  ? "bg-red-600 text-white animate-pulse"
+                  : "bg-blue-600 text-white"
                   }`}
               >
                 {formatTime(timeRemaining)}
@@ -464,7 +464,7 @@ export default function UjianDetailPage() {
               <h3 className="text-sm font-semibold text-gray-800 mb-3">
                 Navigasi Soal
               </h3>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-[repeat(5,min-content)] gap-1.5">
                 {soalList.map((soal, idx) => {
                   const isActive = idx === currentSoal;
                   const answered = !!jawaban[soal.id];
@@ -473,7 +473,7 @@ export default function UjianDetailPage() {
                     <button
                       key={soal.id}
                       onClick={() => setCurrentSoal(idx)}
-                      className={`w-9 h-9 text-xs font-semibold rounded-lg border transition ${isActive
+                      className={`w-9 h-9 text-xs font-semibold rounded-md border transition ${isActive
                           ? "bg-blue-600 text-white border-blue-500"
                           : answered
                             ? "bg-green-500 text-white border-green-500"
@@ -510,7 +510,6 @@ export default function UjianDetailPage() {
                 </p>
               </div>
             </aside>
-
             {/* konten soal */}
             <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
               <div className="flex items-center justify-between mb-4">
@@ -572,14 +571,14 @@ export default function UjianDetailPage() {
                         key={kode}
                         onClick={() => handleJawab(currentSoalData.id, kode)}
                         className={`w-full flex items-start gap-3 text-left text-sm rounded-lg border px-3 py-2.5 transition ${selected
-                            ? "bg-blue-600 text-white border-blue-500 shadow-sm"
-                            : "bg-gray-50 text-gray-800 border-gray-200 hover:bg-gray-100"
+                          ? "bg-blue-600 text-white border-blue-500 shadow-sm"
+                          : "bg-gray-50 text-gray-800 border-gray-200 hover:bg-gray-100"
                           }`}
                       >
                         <span
                           className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold mt-0.5 ${selected
-                              ? "bg-white text-blue-600"
-                              : "bg-gray-200"
+                            ? "bg-white text-blue-600"
+                            : "bg-gray-200"
                             }`}
                         >
                           {kode}

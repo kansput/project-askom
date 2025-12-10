@@ -12,6 +12,7 @@ import {
    getHasilUjian,
    getActiveUjianForPeserta,
    getAllHasilUjian,
+   getJawabanPeserta,
 } from "../controllers/ujianController.js";
 
 const router = Router();
@@ -33,6 +34,7 @@ router.post("/:id/stop", verifyToken, stopUjian);
 router.delete("/:id", verifyToken, deleteUjian);
 router.get("/", verifyToken, getAllUjian);
 router.get("/hasil/all", verifyToken, getAllHasilUjian);
+router.get("/:ujianId/peserta/:pesertaUjianId/jawaban", verifyToken, getJawabanPeserta);
 
 /* ================================================================
    🧑‍⚕️ PERAWAT

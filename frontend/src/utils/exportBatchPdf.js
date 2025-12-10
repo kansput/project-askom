@@ -1,4 +1,4 @@
-export const exportUjianDetailPDF = async (ujian, peserta, jawabanPeserta) => {
+export const exportSingleBatchPdf = async (batch) => {
   const { jsPDF } = await import("jspdf");
 
   const doc = new jsPDF("p", "mm", "a4");
@@ -9,9 +9,9 @@ export const exportUjianDetailPDF = async (ujian, peserta, jawabanPeserta) => {
 
   // Set document metadata
   doc.setProperties({
-    title: `Laporan Ujian - ${peserta.nama}`,
-    subject: "Laporan Detail Ujian",
-    author: "Sistem Manajemen Ujian",
+    title: `Arsip Batch Soal - ${batch.nama}`,
+    subject: "Arsip Soal",
+    author: "Sistem Manajemen Soal",
   });
 
   // Helper untuk check halaman baru
@@ -30,12 +30,12 @@ export const exportUjianDetailPDF = async (ujian, peserta, jawabanPeserta) => {
     doc.setDrawColor(41, 128, 185);
     doc.setLineWidth(0.5);
     doc.line(margin, 15, pageWidth - margin, 15);
-
+    
     doc.setTextColor(41, 128, 185);
     doc.setFontSize(11);
     doc.setFont(undefined, "bold");
-    doc.text("LAPORAN DETAIL UJIAN", margin, 12);
-
+    doc.text("ARSIP BATCH SOAL", margin, 12);
+    
     doc.setFontSize(9);
     doc.setFont(undefined, "normal");
     doc.setTextColor(100, 100, 100);
@@ -49,28 +49,18 @@ export const exportUjianDetailPDF = async (ujian, peserta, jawabanPeserta) => {
   doc.setTextColor(44, 62, 80);
   doc.setFontSize(16);
   doc.setFont(undefined, "bold");
-  doc.text(ujian.judul || "Ujian Teori", margin, y);
+  doc.text(batch.nama, margin, y);
   y += 8;
 
-  // Info Ujian
-  doc.setFontSize(10);
+  doc.setFontSize(9);
   doc.setFont(undefined, "normal");
   doc.setTextColor(100, 100, 100);
-
-  if (ujian.deskripsi) {
-    const splitDesc = doc.splitTextToSize(
-      `Deskripsi: ${ujian.deskripsi}`,
-      contentWidth
-    );
-    doc.text(splitDesc, margin, y);
-    y += splitDesc.length * 5 + 3;
-  }
-
-  doc.text(`Peserta: ${peserta.nama || "-"}`, margin, y);
-  y += 5;
-  doc.text(`Unit: ${peserta.unit || "-"}`, margin, y);
-  y += 5;
-  doc.text(`Skor: ${peserta.skor ?? "-"}`, margin, y);
+  const date = new Date().toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  doc.text(`Total: ${batch.soals.length} Soal | Tanggal: ${date}`, margin, y);
   y += 12;
 
   // Garis pembatas
@@ -84,64 +74,63 @@ export const exportUjianDetailPDF = async (ujian, peserta, jawabanPeserta) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.crossOrigin = "Anonymous";
-
+      
       img.onload = () => {
+        // Create canvas untuk resize & compress
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-
-        const maxWidth = 800;
+        
+        // Max width 600px (cukup untuk PDF)
+        const maxWidth = 600;
         let width = img.width;
         let height = img.height;
-
+        
         if (width > maxWidth) {
           height = (height * maxWidth) / width;
           width = maxWidth;
         }
-
+        
         canvas.width = width;
         canvas.height = height;
+        
+        // Draw image ke canvas
         ctx.drawImage(img, 0, 0, width, height);
-
-        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.75);
+        
+        // Convert ke base64 dengan kompresi JPEG quality 0.6
+        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.6);
+        
+        // Create new image dari compressed base64
         const compressedImg = new Image();
         compressedImg.onload = () => resolve(compressedImg);
         compressedImg.onerror = reject;
         compressedImg.src = compressedBase64;
       };
-
+      
       img.onerror = reject;
       img.src = src;
     });
   };
 
-  // MAP JAWABAN PESERTA
-  const jawabanMap = {};
-  if (Array.isArray(jawabanPeserta)) {
-    jawabanPeserta.forEach((j) => {
-      jawabanMap[j.soalId] = j;
-    });
-  }
-
   // Loop setiap soal
-  for (let index = 0; index < ujian.batchSoal.soals.length; index++) {
-    const soal = ujian.batchSoal.soals[index];
+  for (let index = 0; index < batch.soals.length; index++) {
+    const soal = batch.soals[index];
 
     // Check space untuk soal baru
     checkNewPage(25);
 
     // Nomor dan Pertanyaan
     doc.setTextColor(44, 62, 80);
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     doc.setFont(undefined, "bold");
     const questionText = `${index + 1}. ${soal.pertanyaan}`;
     const splitQuestion = doc.splitTextToSize(questionText, contentWidth);
     doc.text(splitQuestion, margin, y);
-    y += splitQuestion.length * 6 + 5;
+    y += splitQuestion.length * 5 + 5;
 
     // Gambar (jika ada)
     if (soal.gambar) {
       checkNewPage(50);
-
+      
       try {
         const img = await loadAndCompressImage(
           `${process.env.NEXT_PUBLIC_API_URL}${soal.gambar}`
@@ -152,8 +141,8 @@ export const exportUjianDetailPDF = async (ujian, peserta, jawabanPeserta) => {
 
         doc.setDrawColor(220, 220, 220);
         doc.setLineWidth(0.5);
-        doc.rect(margin, y, imgWidth, imgHeight, "S");
-        doc.addImage(img, "JPEG", margin, y, imgWidth, imgHeight);
+        doc.rect(margin + 5, y, imgWidth, imgHeight, "S");
+        doc.addImage(img, "JPEG", margin + 5, y, imgWidth, imgHeight);
         y += imgHeight + 8;
       } catch (error) {
         console.warn("Failed to load image:", error);
@@ -163,67 +152,34 @@ export const exportUjianDetailPDF = async (ujian, peserta, jawabanPeserta) => {
     // Opsi jawaban - format text biasa
     doc.setFont(undefined, "normal");
     doc.setFontSize(10);
-
-    const jawaban = jawabanMap[soal.id] || null;
-    const jawabanUser = jawaban ? jawaban.jawabanPeserta : null;
-    const isBenar = jawaban ? jawaban.isBenar : false;
-
+    
     soal.opsi.forEach((opsi) => {
-      checkNewPage(8);
-
-      const isJawabanBenar = opsi.kode === soal.jawabanBenar;
-      const isJawabanUser = opsi.kode === jawabanUser;
-
-      // Color untuk jawaban benar (hijau) dan jawaban user yang salah (merah)
-      if (isJawabanBenar) {
+      checkNewPage(10);
+      
+      // Check apakah ini jawaban benar
+      const isCorrect = opsi.kode === soal.jawabanBenar;
+      
+      if (isCorrect) {
+        // Highlight hijau untuk jawaban benar
+        doc.setFillColor(220, 240, 220);
+        doc.roundedRect(margin + 3, y - 4, contentWidth - 6, 7, 1, 1, "F");
         doc.setTextColor(27, 94, 32);
-        doc.setFont(undefined, "bold");
-      } else if (isJawabanUser && !isBenar) {
-        doc.setTextColor(180, 30, 30);
         doc.setFont(undefined, "bold");
       } else {
         doc.setTextColor(60, 60, 60);
         doc.setFont(undefined, "normal");
       }
-
+      
       const optionText = `${opsi.kode}. ${opsi.text}`;
       const splitOption = doc.splitTextToSize(optionText, contentWidth - 10);
-      
       doc.text(splitOption, margin + 5, y);
       y += splitOption.length * 5 + 2;
     });
 
-    y += 5;
-
-    // Info jawaban peserta - plain text
-    checkNewPage(10);
-    
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.setFont(undefined, "normal");
-    doc.text(`Jawaban Anda: ${jawabanUser || "-"}`, margin, y);
-    y += 5;
-    
-    doc.text(`Jawaban Benar: ${soal.jawabanBenar}`, margin, y);
-    y += 5;
-    
-    if (jawaban) {
-      if (isBenar) {
-        doc.setTextColor(27, 94, 32);
-        doc.text(`Status:  Benar`, margin, y);
-      } else {
-        doc.setTextColor(180, 30, 30);
-        doc.text(`Status:  Salah`, margin, y);
-      }
-    } else {
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Status: Tidak dijawab`, margin, y);
-    }
-    
-    y += 12;
+    y += 8;
 
     // Garis pemisah antar soal
-    if (index < ujian.batchSoal.soals.length - 1) {
+    if (index < batch.soals.length - 1) {
       checkNewPage(8);
       doc.setDrawColor(230, 230, 230);
       doc.setLineWidth(0.2);
@@ -240,6 +196,6 @@ export const exportUjianDetailPDF = async (ujian, peserta, jawabanPeserta) => {
   }
 
   // Save dengan filename yang clean
-  const cleanName = peserta.nama.replace(/[^a-z0-9]/gi, "_");
-  doc.save(`Laporan_Ujian_${cleanName}.pdf`);
+  const cleanName = batch.nama.replace(/[^a-z0-9]/gi, "_");
+  doc.save(`Batch_${cleanName}.pdf`);
 };

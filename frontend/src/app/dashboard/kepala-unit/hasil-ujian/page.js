@@ -4,7 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { toast } from "react-hot-toast";
-import { handleExportPDFUjian } from "@/utils/exportUjianPDF"; // Nanti kita buat filenya
+import { exportUjianDetailPDF } from "@/utils/exportUjianPDF";
+
 
 export default function HasilUjianAllPage() {
     const [loading, setLoading] = useState(true);
@@ -101,6 +102,33 @@ export default function HasilUjianAllPage() {
             </div>
         );
     }
+
+    const handleDownloadPDF = async (item) => {
+        try {
+            const token = localStorage.getItem("token");
+
+            // 1. Ambil detail ujian
+            const ujianRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ujian/${item.ujianId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const ujianData = (await ujianRes.json()).data;
+
+            // 2. Ambil jawaban peserta
+            const jawabanRes = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/ujian/${item.ujianId}/peserta/${item.pesertaUjianId}/jawaban`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            const jawabanPeserta = (await jawabanRes.json()).data;
+
+            // 3. Generate PDF lengkap
+            exportUjianDetailPDF(ujianData, item, jawabanPeserta);
+
+        } catch (err) {
+            console.error(err);
+            toast.error("Gagal membuat PDF");
+        }
+    };
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
@@ -220,7 +248,7 @@ export default function HasilUjianAllPage() {
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
                                                     <button
-                                                        onClick={() => handleExportPDFUjian(item)}
+                                                        onClick={() => handleDownloadPDF(item)}
                                                         className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-medium rounded-lg shadow hover:from-emerald-700 hover:to-emerald-800 transition"
                                                     >
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
