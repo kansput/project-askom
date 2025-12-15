@@ -6,6 +6,8 @@ import Link from "next/link";
 import { BookOpen, Plus, FileText, Edit, Eye, Trash2, Clock, Calendar, AlertCircle, Loader2, FileDown } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { exportSingleBatchPdf } from "@/utils/exportBatchPdf";
+import { exportBatchSoalOnlyPdf } from "@/utils/exportBatchSoalOnlyPdf";
+
 
 
 
@@ -239,54 +241,61 @@ export default function BatchSoalListPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-2 pt-2">
+                  <div className="space-y-3 pt-3">
 
-                    {/* DETAIL */}
-                    <a
-                      href={`/ujian/batchsoal/${batch.id}`}
-                      className="flex-1 flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium px-4 py-2.5 rounded-lg transition-all border border-blue-200 hover:border-blue-300"
-                    >
-                      <Eye className="w-4 h-4" />
-                      <span>Detail</span>
-                    </a>
+                    {/* Baris 1 */}
+                    <div className="flex gap-2">
+                      <a
+                        href={`/ujian/batchsoal/${batch.id}`}
+                        className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white text-blue-600 px-4 py-2.5 hover:bg-slate-50 transition"
+                      >
+                        <Eye className="w-4 h-4" />
+                        Detail
+                      </a>
 
-                    {/* EDIT */}
-                    <a
-                      href={`/ujian/batchsoal/create?edit=${batch.id}`}
-                      className="flex-1 flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium px-4 py-2.5 rounded-lg transition-all border border-amber-200 hover:border-amber-300"
-                    >
-                      <Edit className="w-4 h-4" />
-                      <span>Edit</span>
-                    </a>
+                      <a
+                        href={`/ujian/batchsoal/create?edit=${batch.id}`}
+                        className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white text-amber-600 px-4 py-2.5 hover:bg-slate-50 transition"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Edit
+                      </a>
 
-                    {/* DELETE */}
-                    <button
-                      onClick={() =>
-                        openConfirm(
-                          `Hapus batch soal "${batch.nama}"?`,
-                          () => handleDelete(batch.id)
-                        )
-                      }
-                      disabled={deleteLoading === batch.id}
-                      className="flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-700 font-medium px-4 py-2.5 rounded-lg transition-all border border-red-200 hover:border-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {deleteLoading === batch.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
+                      <button
+                        onClick={() =>
+                          openConfirm(
+                            `Hapus batch soal "${batch.nama}"?`,
+                            () => handleDelete(batch.id)
+                          )
+                        }
+                        className="flex items-center justify-center rounded-lg border border-slate-200 bg-white text-red-500 px-3 py-2.5 hover:bg-red-50 transition"
+                      >
                         <Trash2 className="w-4 h-4" />
-                      )}
-                    </button>
+                      </button>
+                    </div>
 
-                    {/* DOWNLOAD PDF */}
-                    <button
-                      onClick={() => exportSingleBatchPdf(batch)}
-                      className="flex-1 flex items-center justify-center gap-2 bg-purple-50 hover:bg-purple-100 text-purple-700 font-medium px-4 py-2.5 rounded-lg transition-all border border-purple-200 hover:border-purple-300"
-                    >
-                      <FileDown className="w-4 h-4" />
-                      <span>PDF</span>
-                    </button>
+                    {/* Baris 2 (Export lebih soft) */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => exportBatchSoalOnlyPdf(batch)}
+                        className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-slate-50 text-slate-600 px-4 py-2.5 hover:bg-slate-100 transition"
+                      >
+                        <FileDown className="w-4 h-4" />
+                        Soal
+                      </button>
+
+                      <button
+                        onClick={() => exportSingleBatchPdf(batch)}
+                        className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-slate-50 text-slate-600 px-4 py-2.5 hover:bg-slate-100 transition"
+                      >
+                        <FileDown className="w-4 h-4" />
+                        Soal + Jawaban
+                      </button>
+                    </div>
 
                   </div>
+
+
                 </div>
               </div>
             ))}
